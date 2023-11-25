@@ -98,6 +98,26 @@
 		case 'empresasDelete':
 			$response = empresasDelete($jsonParams);
 			break;
+
+		// Busca un cliente.
+		case 'clientesSearch':
+			$response = clientesSearch($jsonParams);
+			break;
+
+		// Carga un cliente.
+		case 'clientesLoad':
+			$response = clientesLoad($jsonParams);
+			break;
+
+		// Guarda un cliente.
+		case 'clientesSave':
+			$response = clientesSave($jsonParams);
+			break;
+
+		// Elimina un cliente.
+		case 'clientesDelete':
+			$response = clientesDelete($jsonParams);
+			break;
 	}
 	
 	$jsonData = json_encode($response, JSON_INVALID_UTF8_IGNORE + JSON_UNESCAPED_UNICODE);

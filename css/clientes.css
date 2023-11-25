@@ -1,0 +1,15 @@
+
+.clientesBody {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.clientesWindow {
+    width: 380px;
+}
+
+.clientesBody [name="nombre"] {
+    width: 300px;
+}

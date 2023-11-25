@@ -25,7 +25,7 @@ function showMenu() {
                     {
                         'text': 'Clientes',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Clientes', './clientes.php', true);
                         }
                     }
                 ]

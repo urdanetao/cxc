@@ -595,4 +595,232 @@
 
 		return getResultObject(true, 'Registro eliminado con exito');
 	}
+
+
+	/**
+	 * Busca un cliente.
+	 */
+	function clientesSearch($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+        $textToFind = $jsonParams['textToFind'];
+        
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+		
+        $sqlCommand =
+            "select t.* from clientes as t where t.nombre like '%$textToFind%' order by t.nombre";
+        $cursor = $conn->Query($sqlCommand);
+
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+        $msg = strval(count($cursor)) . ' Registros encontrados';
+        return getResultObject(true, $msg, $cursor);
+    }
+
+
+	/**
+	 * Carga un clientes.
+	 */
+	function clientesLoad($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				t.*
+			from
+				clientes as t
+			where
+				t.id = '$id';";
+		$r = $conn->Query($sqlCommand);
+
+		if ($r === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		if (count($r) > 0) {
+			$r = $r[0];
+		}
+
+		return getResultObject(true, '', $r);
+	}
+
+
+	/**
+	 * Guarda un cliente.
+	 */
+	function clientesSave($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+		$nombre = $jsonParams['nombre'];
+
+		// Valida los campos requeridos.
+		if ($nombre == '') {
+			return getResultObject(false, 'Debe indicar el nombre del cliente');
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Inicia la transaccion.
+		if ($conn->Query('start transaction;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Valida que no exista otro registro con el mismo valor en las siglas o el nombre.
+		$sqlCommand =
+			"select
+				t.*
+			from
+				clientes as t
+			where
+				t.nombre = '$nombre'";
+		if ($id != '') {
+			$sqlCommand .= " and t.id <> '$id'";
+		}
+		$result = $conn->Query($sqlCommand);
+
+		if ($result === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) > 0) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, 'Ya existe un cliente registrado con este mismo nombre');
+		}
+
+		// Si no tiene correlativo.
+		if ($id == '') {
+			// Busca el siguiente correlativo.
+			$sqlCommand = "select t.id from clientes as t order by t.id desc limit 1;";
+			$result = $conn->Query($sqlCommand);
+
+			if ($result === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+
+			if (count($result) == 0) {
+				$id = 1;
+			} else {
+				$id = intval($result[0]['id']) + 1;
+			}
+
+			// Agrega el nuevo registro.
+			$sqlCommand =
+				"insert into clientes (
+					id, nombre)
+				values (
+					'$id', '$nombre');";
+		} else {
+			// Actualiza el registro.
+			$sqlCommand =
+				"update clientes set
+					nombre = '$nombre'
+				where
+					id = '$id'";
+		}
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		$data['id'] = $id;
+		return getResultObject(true, 'Registro guardado con exito', $data);
+	}
+
+
+	/**
+	 * Elimina un cliente.
+	 */
+	function clientesDelete($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+
+		if ($id == '') {
+			return getResultObject(false, 'Sin codigo de registro');
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Inicia la transaccion.
+		if ($conn->Query('start transaction;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand = "delete from clientes where id = '$id'";
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, 'Registro eliminado con exito');
+	}
 ?>
