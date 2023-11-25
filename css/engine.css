@@ -1,0 +1,80 @@
+
+.engineBody {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.engineBodyArea {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+    display: flex;
+}
+
+/* Barra de scroll area de menu */
+.engineBodyMenuArea {
+    width: 250px;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #ddd;
+}
+
+.engineBodyMenuArea::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.engineBodyMenuArea::-webkit-scrollbar:vertical {
+    width:10px;
+}
+
+.engineBodyMenuArea::-webkit-scrollbar-button:increment,
+.engineBodyMenuArea::-webkit-scrollbar-button {
+    display: none;
+} 
+
+.engineBodyMenuArea::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+.engineBodyMenuArea::-webkit-scrollbar-thumb {
+    background-color: #797979;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}
+
+.engineBodyMenuArea::-webkit-scrollbar-track {
+    border-radius: 10px;  
+}
+
+/* Barra de scroll area de trabajo. */
+.engineBodyWorkArea {
+    width: calc(100vw - 250px);
+    height: calc(100vh - 50px);
+    overflow: hidden;
+}
+
+.engineBodyWorkArea::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.engineBodyWorkArea::-webkit-scrollbar:vertical {
+    width:10px;
+}
+
+.engineBodyWorkArea::-webkit-scrollbar-button:increment,
+.engineBodyWorkArea::-webkit-scrollbar-button {
+    display: none;
+} 
+
+.engineBodyWorkArea::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+.engineBodyWorkArea::-webkit-scrollbar-thumb {
+    background-color: #797979;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}

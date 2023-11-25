@@ -1,0 +1,56 @@
+
+.loginPanelBody {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginPanelBox {
+    width: 300px;
+    padding: 20px;
+    background-color: #11414f;
+    color: #fff;
+}
+
+.loginPanelIconBox {
+    display: flex;
+    justify-content: center;
+}
+
+.loginPanelIcon {
+    border: 1px solid #fff;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.loginPanelIcon>span {
+    font-size: 45px;
+}
+
+.loginPanelControlsBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginPanelForgotPwdBox {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.loginPanelForgotPwdBox>span {
+    font-size: 12px;
+}
+
+.loginPanelForgotPwdBox>span:hover {
+    cursor: pointer;
+    color: #ccc;
+    text-decoration: underline;
+}
+
+.loginPanelButtonsBox {
+    display: flex;
+    justify-content: center;
+}

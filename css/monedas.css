@@ -1,0 +1,19 @@
+
+.monedasBody {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.monedasWindow {
+    width: 380px;
+}
+
+.monedasBody [name="siglas"] {
+    width: 50px;
+}
+
+.monedasBody [name="nombre"] {
+    width: 250px;
+}

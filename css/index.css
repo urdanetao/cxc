@@ -1,0 +1,13 @@
+
+* {
+    font-size: 14px;
+}
+
+body {
+    background-color: #ddd;
+}
+
+.indexBody {
+    max-width: 1600px;
+    margin: auto;
+}

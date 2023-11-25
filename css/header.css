@@ -1,0 +1,23 @@
+
+.headerBody {
+    width: 100%;
+    height: 50px;
+    background-color: royalblue;
+}
+
+.headerBox {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 10px;
+}
+
+.headerLogoBox {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-image: url('./img/saiver.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}

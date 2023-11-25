@@ -1,0 +1,85 @@
+
+.homeBody {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.homeBodyArea {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+    display: flex;
+}
+
+/* Barra de scroll area de menu. */
+.homeBodyMenuArea {
+    width: 250px;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #ddd;
+}
+
+.homeBodyMenuArea::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.homeBodyMenuArea::-webkit-scrollbar:vertical {
+    width:10px;
+}
+
+.homeBodyMenuArea::-webkit-scrollbar-button:increment,
+.homeBodyMenuArea::-webkit-scrollbar-button {
+    display: none;
+} 
+
+.homeBodyMenuArea::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+.homeBodyMenuArea::-webkit-scrollbar-thumb {
+    background-color: #797979;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}
+
+.homeBodyMenuArea::-webkit-scrollbar-track {
+    border-radius: 10px;  
+}
+
+/* Barra de scroll area de trabajo. */
+.homeBodyWorkArea {
+    width: calc(100% - 250px);
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.homeBodyWorkArea::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.homeBodyWorkArea::-webkit-scrollbar:vertical {
+    width:10px;
+}
+
+.homeBodyWorkArea::-webkit-scrollbar-button:increment,
+.homeBodyWorkArea::-webkit-scrollbar-button {
+    display: none;
+} 
+
+.homeBodyWorkArea::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+.homeBodyWorkArea::-webkit-scrollbar-thumb {
+    background-color: #797979;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}
+
+.homeBodyWorkArea::-webkit-scrollbar-track {
+    border-radius: 10px;  
+}

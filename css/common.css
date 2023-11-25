@@ -1,0 +1,247 @@
+
+/* Definicion de estilos generales de la aplicacion. */
+.window {
+    border: 2px solid royalblue;
+    background-color: #fff;
+}
+
+.windowTitle {
+    background-color: royalblue;
+    padding: 10px 15px;
+}
+
+.windowTitle > h6 {
+    color: #fff;
+    margin: 0px;
+}
+
+.windowBox {
+    padding: 20px;
+    border-radius: 0px 0px 5px 5px;
+}
+
+/* Oculta el texto que no cabe en un contenedor. */
+.hideText {
+    white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Bordes. */
+.b1 {
+    border: 1px solid green;
+}
+
+.b2 {
+    border: 1px solid blue;
+}
+
+.b3 {
+    border: 1px solid red;
+}
+
+/* Campos Ocultos. */
+.hide {
+    display: none;
+}
+
+/* Etiquetas */
+label {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Cajas flexibles. */
+.flex {
+    display: flex;
+}
+
+.flex-hcenter {
+    justify-content: center;
+}
+
+.flex-right {
+    justify-content: flex-end;
+}
+
+.flex-vcenter {
+    align-items: center;
+}
+
+.flex-space-between {
+    justify-content: space-between;
+}
+
+.flex-space-around {
+    justify-content: space-around;
+}
+
+/* Tamaño y color de la fuente de las etiquetas. */
+.lbl-light {
+    color: #fff;
+}
+
+.lbl-mini {
+    color: #fff;
+    font-size: 14px;
+}
+
+.lbl-link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.hsep5 {
+    width: 5px;
+}
+
+.hsep10 {
+    width: 10px;
+}
+
+.vsep5 {
+    height: 5px;
+}
+
+.vsep10 {
+    height: 10px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0px;
+    color: #fff;
+}
+
+.lbl {
+    color: #666;
+    margin: 0px;
+    font-size: 14px;
+}
+
+.lbl-15 {
+    font-size: 15px;
+}
+
+/* Tamaño de fuente de los botones. */
+.btn {
+    font-size: 14px;
+    padding: 5px 10px;
+}
+
+.mini-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0px 0px;
+    font-size: 13px;
+}
+
+/* Cuadros de texto. */
+.txb {
+    font-size: 14px;
+    color: #666;
+    padding: 0px 5px;
+    border-top: none;
+    border-right: none;
+    border-bottom: 1px solid #666;
+    border-left: none;
+}
+
+.txb:focus {
+    outline: none;
+    border-bottom: 1px solid #666;
+}
+
+/* Controles de texto */
+.txb-str {
+    text-transform: uppercase;
+}
+
+.txb-str-low {
+    text-transform: lowercase;
+}
+
+/* Dialogos. */
+.dlg {
+    border: none;
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 1);
+    padding: 0px;
+}
+
+.dlg-content {
+    margin: 15px 15px;
+}
+
+/* Celdas de tablas. */
+.cell-title {
+    border: 1px solid #6D6E6A;
+    background-color: #3F3F66;
+    padding: 0px 10px;
+}
+
+.cell-title > div > span {
+    color: #fff;
+    font-size: 14px;
+}
+
+.cell-data {
+    border: 1px solid #ddd;
+    padding: 0px 10px;
+}
+
+.cell-data > div > span {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Grids. */
+.grd-col-hidden {
+    display: none;
+}
+
+.grd-data-row:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.grd-data-row:hover > td > div > span {
+    color: #666;
+}
+
+.grd-selected-row {
+    background-color: #014268;
+}
+
+.grd-selected-row > td > div > span {
+    color: #fff;
+}
+
+.grd-selected-row:hover {
+    cursor: pointer;
+    background-color: #014268;
+}
+
+.grd-selected-row:hover > td > div > span {
+    color: #fff;
+}
+
+/* Textarea */
+textarea {
+    resize: none;
+}
+
+/* Fieldset y legend. */
+fieldset {
+    padding: 0px 15px 15px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+legend {
+    width: auto;
+    font-size: 16px;
+    font-weight: normal;
+    color: #888;
+    margin: 0px;
+    padding: 2px 5px;
+}
