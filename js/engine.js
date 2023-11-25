@@ -19,7 +19,7 @@ function showMenu() {
                     {
                         'text': 'Empresas',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Empresas', './empresas.php', true);
                         }
                     },
                     {

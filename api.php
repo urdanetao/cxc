@@ -78,6 +78,26 @@
 		case 'monedasDelete':
 			$response = monedasDelete($jsonParams);
 			break;
+		
+		// Busca una empresa.
+		case 'empresasSearch':
+			$response = empresasSearch($jsonParams);
+			break;
+
+		// Carga una empresa.
+		case 'empresasLoad':
+			$response = empresasLoad($jsonParams);
+			break;
+
+		// Guarda una empresa.
+		case 'empresasSave':
+			$response = empresasSave($jsonParams);
+			break;
+
+		// Elimina una empresa.
+		case 'empresasDelete':
+			$response = empresasDelete($jsonParams);
+			break;
 	}
 	
 	$jsonData = json_encode($response, JSON_INVALID_UTF8_IGNORE + JSON_UNESCAPED_UNICODE);
