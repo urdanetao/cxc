@@ -38,7 +38,7 @@ function showMenu() {
                     {
                         'text': 'Cuentas por Cobrar',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Cuentas por Cobrar', './cxc.php', true);
                         }
                     }
                 ]

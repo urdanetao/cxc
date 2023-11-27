@@ -5,6 +5,7 @@
 .coreDialog {
 	border: none;
 	padding: 0px;
+	box-shadow: 0px 0px 10px 2px rgba(46, 74, 117, 1);
 }
 
 /* ------------------------ */
@@ -26,7 +27,6 @@
 /* ------------------------ */
 .dialogConfirmHeader {
 	background-color: royalblue !important;
-	border-radius: 5px 5px 0px 0px;
 	padding: 10px 10px;
 }
 
@@ -51,7 +51,6 @@
 .dialogConfirmFooter {
 	padding: 15px;
 	background-color: #eee;
-	border-radius: 0px 0px 5px 5px;
 }
 
 .dialogConfirmFooter button {
@@ -144,12 +143,10 @@
 	max-width: 85vw;
 	max-height: 60vh;
 	background-color: #fff;
-	border-radius: 5px;
 }
 
 .dialogConfirmHeader {
 	background-color: royalblue;
-	border-radius: 5px 5px 0px 0px;
 	padding: 10px 10px;
 }
 
@@ -174,7 +171,6 @@
 .dialogConfirmFooter {
 	padding: 15px;
 	background-color: #D9D7D7;
-	border-radius: 0px 0px 5px 5px;
 }
 
 .dialogConfirmFooter button {
@@ -184,10 +180,6 @@
 /* ------------ */
 /* Dialog Error */
 /* ------------ */
-/* .dialogErrorMainContainer {
-	background-color: #fff;
-} */
-
 .dialog-error-img > img {
 	width: 100px;
 	height: 100px;
@@ -199,46 +191,6 @@
 
 .dialogErrorBtnOk {
 	width: 80px;
-}
-
-/* ------------------- */
-/* Mensajes al Usuario */
-/* ------------------- */
-#user-message {
-    display: none;
-    position: fixed;
-    right: 10px;
-    top: 60px;
-    z-index: 100;
-    border-radius: 4px;
-    padding: 10px 12px;
-}
-
-#user-message-controls {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-#user-message-content {
-    display: flex;
-}
-
-#user-message-text {
-	color: #fff;
-    font-size: 13px;
-}
-
-#user-message-close-btn {
-    font-size: 10px;
-    background: #1F3C52;
-    padding: 5px;
-    margin-left: 10px;
-    color: #fff;
-}
-
-#user-message-close-btn:hover {
-    cursor: pointer;
 }
 
 /* ------------------ */
@@ -313,7 +265,6 @@
 
 .gridControlTableTitle {
 	padding: 2px 5px;
-	border-radius: 5px 5px 0px 0px;
 	background-color: royalblue;
 	width: 100%;
 }

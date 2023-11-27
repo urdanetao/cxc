@@ -1,0 +1,7 @@
+
+.cxcBody {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
