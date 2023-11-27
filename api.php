@@ -118,6 +118,11 @@
 		case 'clientesDelete':
 			$response = clientesDelete($jsonParams);
 			break;
+		
+		// Obtiene el saldo general por moneda.
+		case 'saldoGeneralMoneda':
+			$response = saldoGeneralMoneda($jsonParams);
+			break;
 	}
 	
 	$jsonData = json_encode($response, JSON_INVALID_UTF8_IGNORE + JSON_UNESCAPED_UNICODE);

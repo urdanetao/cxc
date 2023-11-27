@@ -1,7 +1,24 @@
 
 .cxcBody {
     width: 100%;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 50px - 32px);
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.cxcBody [name="idemp"],
+.cxcBody [name="nomcli"] {
+    width: 250px;
+}
+
+.cxcBody [name="idmon"] {
+    width: 70px;
+}
+
+.cxcBody [name="totalCxC"] {
+    width: 130px;
+}
+
+.cxcBody .space {
+    width: 17px;
 }

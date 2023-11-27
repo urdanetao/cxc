@@ -176,7 +176,11 @@
 			return getResultObject(false, 'Acceso denegado');
 		}
 
-		$id = $jsonParams['id'];
+		$unique = false;
+		if (isset($jsonParams['id'])) {
+			$unique = true;
+			$id = $jsonParams['id'];
+		}
 
 		$dbInfo = getMySqlDbInfo('cxc');
 		$conn = new MySqlDataManager($dbInfo);
@@ -189,9 +193,13 @@
 			"select
 				t.*
 			from
-				monedas as t
-			where
-				t.id = '$id';";
+				monedas as t";
+		
+		if ($unique) {
+			$sqlCommand .= " where t.id = '$id'";
+		}
+
+		$sqlCommand .= ';';
 		$r = $conn->Query($sqlCommand);
 
 		if ($r === false) {
@@ -201,7 +209,7 @@
 
 		$conn->Close();
 
-		if (count($r) > 0) {
+		if ($unique && count($r) > 0) {
 			$r = $r[0];
 		}
 
@@ -410,7 +418,11 @@
 			return getResultObject(false, 'Acceso denegado');
 		}
 
-		$id = $jsonParams['id'];
+		$unique = false;
+		if (isset($jsonParams['id'])) {
+			$unique = true;
+			$id = $jsonParams['id'];
+		}
 
 		$dbInfo = getMySqlDbInfo('cxc');
 		$conn = new MySqlDataManager($dbInfo);
@@ -423,9 +435,13 @@
 			"select
 				t.*
 			from
-				empresas as t
-			where
-				t.id = '$id';";
+				empresas as t";
+
+		if ($unique) {
+			$sqlCommand .= "where t.id = '$id'";
+		}
+
+		$sqlCommand .= ';';
 		$r = $conn->Query($sqlCommand);
 
 		if ($r === false) {
@@ -435,7 +451,7 @@
 
 		$conn->Close();
 
-		if (count($r) > 0) {
+		if ($unique && count($r) > 0) {
 			$r = $r[0];
 		}
 
@@ -822,5 +838,71 @@
 		$conn->Close();
 
 		return getResultObject(true, 'Registro eliminado con exito');
+	}
+
+
+	/**
+	 * Toma el saldo general por moneda.
+	 */
+	function saldoGeneralMoneda($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$idemp = $jsonParams['idemp'];
+		$tipo = $jsonParams['tipo'];
+
+		if ($tipo == '0') {
+			$condTipo = 'true';
+		} else {
+			$condTipo = "c.tipo = '$tipo'";
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				t.*,
+				(t.debitos - t.creditos) as saldo
+			from
+				(select
+					m.id as idmon,
+					m.nombre as nommon,
+					coalesce((select
+						sum(d.monto)
+					from
+						cxcdet as d
+						left join cxc as c
+						on
+							c.idemp = '$idemp' and
+							$condTipo and
+							c.id = d.idparent and
+							c.idmon = m.id), 0) as debitos,
+					coalesce((select
+						sum(p.monto)
+					from
+						cxcpag as p
+						left join cxc as c
+						on
+							c.idemp = '$idemp' and
+							$condTipo and
+						 	c.id = p.idparent and
+							c.idmon = m.id), 0) as creditos
+				from
+					monedas as m) as t";
+
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+		return getResultObject(true, '', $cursor);
 	}
 ?>
