@@ -44,7 +44,7 @@
                 </div>
                 <br>
                 <div class="flex flex-hcenter">
-                    <button class="btn btn-dark btnLogin">Ingresar</button>
+                    <button class="btn btn-success btnLogin">Ingresar</button>
                 </div>
             </div>
         </div>

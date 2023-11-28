@@ -867,35 +867,106 @@
 
 		$sqlCommand =
 			"select
-				t.*,
-				(t.debitos - t.creditos) as saldo
+				x.*,
+				(x.debitos - x.creditos) as saldo
 			from
 				(select
-					m.id as idmon,
-					m.nombre as nommon,
-					coalesce((select
-						sum(d.monto)
-					from
-						cxcdet as d
-						left join cxc as c
-						on
-							c.idemp = '$idemp' and
-							$condTipo and
-							c.id = d.idparent and
-							c.idmon = m.id), 0) as debitos,
-					coalesce((select
-						sum(p.monto)
-					from
-						cxcpag as p
-						left join cxc as c
-						on
-							c.idemp = '$idemp' and
-							$condTipo and
-						 	c.id = p.idparent and
-							c.idmon = m.id), 0) as creditos
+					t.idmon,
+					t.nommon,
+					sum(t.debitos) as debitos,
+					sum(t.creditos) as creditos
 				from
-					monedas as m) as t";
+					(select
+						c.idmon,
+						m.nombre as nommon,
+						(select sum(d.monto) from cxcdet as d where d.idparent = c.id) as debitos,
+						coalesce((select sum(p.monto) from cxcpag as p where p.idparent = c.id), 0) as creditos
+					from
+						cxc as c
+						left join monedas as m on m.id = c.idmon
+					where
+						c.idemp = '$idemp' and
+						$condTipo) as t
+				group by
+					t.idmon,
+					t.nommon) as x
+			order by
+				x.nommon";
 
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+		return getResultObject(true, '', $cursor);
+	}
+
+
+	/**
+	 * Obtiene el saldo general por cliente.
+	 */
+	function saldoGeneralCliente($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$idemp = $jsonParams['idemp'];
+		$tipo = $jsonParams['tipo'];
+		$idmon = $jsonParams['idmon'];
+		$idcli = $jsonParams['idcli'];
+
+		if ($tipo == '0') {
+			$condTipo = 'true';
+		} else {
+			$condTipo = "c.tipo = '$tipo'";
+		}
+
+		if ($idcli == '') {
+			$condCliente = 'true';
+		} else {
+			$condCliente = "c.idcli = '$idcli'";
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				x.idcli,
+				x.nomcli,
+				sum(x.debitos) as debitos,
+				sum(x.creditos) as creditos,
+				sum(x.saldo) as saldo
+			from
+				(select
+					t.*,
+					(t.debitos - t.creditos) as saldo
+				from
+					(select
+						c.idcli,
+						cl.nombre as nomcli,
+						(select sum(t.monto) from cxcdet as t where t.idparent = c.id) as debitos,
+						coalesce((select sum(t.monto) from cxcpag as t where t.idparent = c.id), 0) as creditos
+					from
+						cxc as c
+						left join clientes as cl on cl.id = c.idcli
+					where
+						c.idemp = '$idemp' and
+						$condTipo and
+						c.idmon = '$idmon' and
+						$condCliente) as t) as x
+			group by
+				x.idcli,
+				x.nomcli
+			order by
+				x.nomcli";
+		
 		$cursor = $conn->Query($sqlCommand);
 		if ($cursor === false) {
 			$conn->Close();

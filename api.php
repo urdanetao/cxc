@@ -123,6 +123,11 @@
 		case 'saldoGeneralMoneda':
 			$response = saldoGeneralMoneda($jsonParams);
 			break;
+
+		// Obtiene el saldo general por cliente.
+		case 'saldoGeneralCliente':
+			$response = saldoGeneralCliente($jsonParams);
+			break;
 	}
 	
 	$jsonData = json_encode($response, JSON_INVALID_UTF8_IGNORE + JSON_UNESCAPED_UNICODE);

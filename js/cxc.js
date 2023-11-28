@@ -66,6 +66,7 @@ function loadResumenMoneda() {
 
     if (r.idemp == '0') {
         showResumenMoneda([]);
+        loadResumenCliente('');
         return;
     }
 
@@ -77,6 +78,7 @@ function loadResumenMoneda() {
             return;
         }
         showResumenMoneda(response.data);
+        loadResumenCliente('');
     });
 }
 
@@ -95,17 +97,7 @@ function showResumenMoneda(data) {
         'rows': data,
         'showMaxRows': 5,
         'onClick': (t) => {
-            // core.showLoading();
-            // core.apiFunction('clientesLoad', {'id': t.id}, function(response) {
-            //     core.hideLoading();
-            //     if (!response.status) {
-            //         core.showMessage(response.message, 2, core.color.error);
-            //         return;
-            //     }
-            //     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-            //     core.form.setData(currentArea, response.data);
-            //     core.form.setState(currentArea, core.form.state.showing);
-            // });
+            loadResumenCliente(t.idmon);
         }
     };
 
@@ -121,9 +113,9 @@ function showResumenCliente(data) {
     var gridStructure = {
         'tableTitle': 'Clientes registrados y saldos',
         'columns': [
-            {'title': 'ID', 'field': 'id', 'width': '50px', 'hide': true},
-            {'title': 'CLIENTE', 'field': 'nombre', 'width': '300px', 'type': 'string'},
-            {'title': 'MONTO', 'field': 'monto', 'width': '120px', 'type': 'number', 'dataAlign': 'right', 'decimalPlaces': 2, 'thousandSep': true}
+            {'title': 'ID', 'field': 'idcli', 'width': '50px', 'hide': true},
+            {'title': 'CLIENTE', 'field': 'nomcli', 'width': '300px', 'type': 'string'},
+            {'title': 'MONTO', 'field': 'saldo', 'width': '120px', 'type': 'number', 'dataAlign': 'right', 'decimalPlaces': 2, 'thousandSep': true}
         ],
         'rows': data,
         'showMaxRows': 15,
@@ -177,6 +169,16 @@ function cxcClienteSearch() {
                 r.idcli = response.data.id;
                 r.nomcli = response.data.nombre;
 				core.form.setData(currentArea, r);
+
+                // Toma la moneda seleccionada.
+                var m = core.grid.getSelectedRow($('.resumenMonedaBox', currentArea));
+                var idmon = '';
+
+                if (m.hasOwnProperty('idmon')) {
+                    idmon = m.idmon;
+                }
+
+                loadResumenCliente(idmon);
 			});
 		}
 	});
@@ -192,6 +194,53 @@ function cxcClienteRemove() {
     r.idcli = '';
     r.nomcli = '';
     core.form.setData(currentArea, r);
+
+    // Toma la moneda seleccionada.
+    var m = core.grid.getSelectedRow($('.resumenMonedaBox', currentArea));
+    var idmon = '';
+
+    if (m.hasOwnProperty('idmon')) {
+        idmon = m.idmon;
+    }
+
+    loadResumenCliente(idmon);
+}
+
+
+/**
+ * Carga el resumen por cliente.
+ */
+function loadResumenCliente(idmon) {
+    var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+    var r = core.transform2Json(core.form.getData(currentArea));
+    var params = {
+        idemp: r.idemp,
+        tipo: r.tipo,
+        idmon: idmon,
+        idcli: r.idcli
+    };
+
+    core.showLoading();
+    core.apiFunction('saldoGeneralCliente', params, (response) => {
+        core.hideLoading();
+        if (!response.status) {
+            core.showMessage(response.message, 4, core.color.error);
+            return;
+        }
+
+        var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+        showResumenCliente(response.data);
+
+        // Calcula el total.
+        var totalCxC = 0;
+        for (var i = 0; i < Object.keys(response.data).length; i++) {
+            totalCxC += parseFloat(response.data[i].saldo);
+        }
+
+        var r = core.transform2Json(core.form.getData(currentArea));
+        r.totalCxC = totalCxC;
+        core.form.setData(currentArea, r);
+    });
 }
 
 
