@@ -59,6 +59,16 @@
 			$response = logout();
 			break;
 		
+		// Carga la configuracion.
+		case 'configLoad':
+			$response = configLoad();
+			break;
+			
+		// Guarda la configuracion.
+		case 'configSave':
+			$response = configSave($jsonParams);
+			break;
+
 		// Busca una moneda.
 		case 'monedasSearch':
 			$response = monedasSearch($jsonParams);
@@ -127,6 +137,26 @@
 		// Obtiene el saldo general por cliente.
 		case 'saldoGeneralCliente':
 			$response = saldoGeneralCliente($jsonParams);
+			break;
+
+		// Obtiene el resumen de un cliente.
+		case 'loadDetalleCliente':
+			$response = loadDetalleCliente($jsonParams);
+			break;
+
+		// Obtiene el detalle de un documento y sus abonos.
+		case 'loadDetalleAbonos':
+			$response = loadDetalleAbonos($jsonParams);
+			break;
+
+		// Carga productos desde la base de datos SAINT.
+		case 'saintProductosLoad':
+			$response = saintProductosLoad($jsonParams);
+			break;
+
+		// Busca productos desde la base de datos SAINT.
+		case 'saintProductosSearch':
+			$response = saintProductosSearch($jsonParams);
 			break;
 	}
 	

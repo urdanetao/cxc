@@ -90,7 +90,8 @@ function showResumenMoneda(data) {
     var gridStructure = {
         'tableTitle': 'Monedas registradas y saldos',
         'columns': [
-            {'title': 'ID', 'field': 'idmon', 'width': '50px', 'hide': true},
+            {'title': 'IDMON', 'field': 'idmon', 'width': '50px', 'hide': true},
+            {'title': 'SIGLAS', 'field': 'siglas', 'width': '50px', 'hide': true},
             {'title': 'MONEDA', 'field': 'nommon', 'width': '200px', 'type': 'string'},
             {'title': 'MONTO', 'field': 'saldo', 'width': '120px', 'type': 'number', 'dataAlign': 'right', 'decimalPlaces': 2, 'thousandSep': true}
         ],
@@ -120,17 +121,17 @@ function showResumenCliente(data) {
         'rows': data,
         'showMaxRows': 15,
         'onClick': (t) => {
-            // core.showLoading();
-            // core.apiFunction('clientesLoad', {'id': t.id}, function(response) {
-            //     core.hideLoading();
-            //     if (!response.status) {
-            //         core.showMessage(response.message, 2, core.color.error);
-            //         return;
-            //     }
-            //     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-            //     core.form.setData(currentArea, response.data);
-            //     core.form.setState(currentArea, core.form.state.showing);
-            // });
+            var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+            var r = core.transform2Json(core.form.getData(currentArea));
+            var m = core.grid.getSelectedRow($('.resumenMonedaBox', currentArea));
+            r.nomemp = $('[name="idemp"] option:selected', currentArea).html();
+            r.tipoTexto = $('[name="tipo"] option:selected', currentArea).html();
+            r.idmon = m.idmon;
+            r.siglas = m.siglas;
+            r.nommon = m.nommon;
+            r.idcli = t.idcli;
+            r.nomcli = t.nomcli;
+            core.form.dialog.show('./cxc-detalle.php', r);
         }
     };
 

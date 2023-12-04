@@ -1,0 +1,14 @@
+
+.addProductoBody input[name="codigo"] {
+    width: 100px;
+}
+
+.addProductoBody input[name="descrip"] {
+    width: 250px;
+}
+
+.addProductoBody input[name="precio"],
+.addProductoBody input[name="cantidad"],
+.addProductoBody input[name="monto"] {
+    width: 100px;
+}

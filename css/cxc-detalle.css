@@ -1,0 +1,20 @@
+
+[name="siglas"] {
+    width: 60px;
+}
+
+[name="nomcli"], [name="nommon"] {
+    width: 250px;
+}
+
+.space {
+    width: 17px;
+}
+
+.spaceVert {
+    height: 50px;
+}
+
+[name="totalCxCCliente"] {
+    width: 130px;
+}

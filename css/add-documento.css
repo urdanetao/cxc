@@ -1,0 +1,21 @@
+
+.datosBox input[name="descrip"] {
+    width: 368px;
+}
+
+.detalleBox input[name="codigo"] {
+    width: 100px;
+}
+
+.detalleBox input[name="descrip"] {
+    width: 300px;
+}
+
+.detalleBox input[name="cantidad"] {
+    width: 60px;
+}
+
+.detalleBox input[name="precio"],
+.detalleBox input[name="monto"] {
+    width: 100px;
+}

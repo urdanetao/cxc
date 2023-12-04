@@ -13,9 +13,6 @@
                 <h6>Cuentas por Cobrar</h6>
             </div>
             <div class="windowBox">
-                <div>
-                    <input type="text" class="txb" name="id" hidden>
-                </div>
                 <div class="flex">
                     <div>
                         <fieldset>
@@ -49,6 +46,10 @@
                         <fieldset>
                             <legend>Resumen General por Moneda</legend>
                             <div class="resumenMonedaBox"></div>
+                            <br>
+                            <div class="flex flex-hcenter">
+                                <button class="btn btn-info">Agregar Transacción</button>
+                            </div>
                         </fieldset>
                     </div>
                     <div class="hsep10"></div>

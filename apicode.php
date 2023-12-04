@@ -7,11 +7,11 @@
 	define('__mysql_pwd', 'admin');
 	
 	// Configuración de conexión a MySQL.
-	function getMySqlDbInfo($dbName) {
+	function getMySqlDbInfo($dbname) {
 		$dbInfo = array();
 		$dbInfo['host'] = __mysql_host;
 		$dbInfo['prefix'] = __mysql_prefix;
-		$dbInfo['dbname'] = $dbName;
+		$dbInfo['dbname'] = $dbname;
 		$dbInfo['user'] = __mysql_user;
 		$dbInfo['pwd'] = __mysql_pwd;
 
@@ -134,6 +134,96 @@
 	    return getResultObject(true, "La sesión ha finalizado...");
 	}
 
+
+	/**
+	 * Carga la configuracion.
+	 */
+	function configLoad() {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+		
+        $sqlCommand = "select t.* from config as t where t.id = '1'";
+        $cursor = $conn->Query($sqlCommand);
+
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Si no existe el id lo agrega.
+		if (count($cursor) == 0) {
+			$sqlCommand =
+				"insert into config (
+					id, host, prefix, dbname, user, pwd)
+				values (
+					'1', '', '', '', '', '');";
+			if ($conn->Query($sqlCommand) === false) {
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+
+			$data['id'] = '1';
+			$data['host'] = '';
+			$data['prefix'] = '';
+			$data['dbname'] = '';
+			$data['user'] = '';
+			$data['pwd'] = '';
+		} else {
+			$data = $cursor[0];
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, '', $data);
+	}
+
+
+	/**
+	 * Guarda la configuracion.
+	 */
+	function configSave($jsonParams) {
+		$host = $jsonParams['host'];
+		$prefix = $jsonParams['prefix'];
+		$dbname = $jsonParams['dbname'];
+		$user = $jsonParams['user'];
+		$pwd = $jsonParams['pwd'];
+
+		// Calcula el hash del password.
+		// $pwdHashed = hash("sha3-512", $pwd);
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+		
+        $sqlCommand =
+            "update config set
+				host = '$host',
+				prefix = '$prefix',
+				dbname = '$dbname',
+				user = '$user',
+				pwd = '$pwd'
+			where
+				id = '1'";
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, 'Registro guardado con exito');
+	}
 
 	/**
 	 * Busca una moneda.
@@ -396,6 +486,47 @@
 		
         $sqlCommand =
             "select t.* from empresas as t where t.nombre like '%$textToFind%' order by t.nombre";
+        $cursor = $conn->Query($sqlCommand);
+
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+        $msg = strval(count($cursor)) . ' Registros encontrados';
+        return getResultObject(true, $msg, $cursor);
+    }
+
+
+	/**
+	 * Busca un producto desde saint.
+	 */
+	function saintProductosSearch($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+        $textToFind = $jsonParams['textToFind'];
+        
+		$dbInfo = getMySqlDbInfo('saiverdb');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+		
+        $sqlCommand =
+            "select
+				t.codprod as codigo,
+				t.descrip as descrip
+			from
+				saprod as t
+			where
+				t.descrip like '%$textToFind%'
+			order by
+				t.descrip";
         $cursor = $conn->Query($sqlCommand);
 
 		if ($cursor === false) {
@@ -872,12 +1003,14 @@
 			from
 				(select
 					t.idmon,
+					t.siglas,
 					t.nommon,
 					sum(t.debitos) as debitos,
 					sum(t.creditos) as creditos
 				from
 					(select
 						c.idmon,
+						m.siglas,
 						m.nombre as nommon,
 						(select sum(d.monto) from cxcdet as d where d.idparent = c.id) as debitos,
 						coalesce((select sum(p.monto) from cxcpag as p where p.idparent = c.id), 0) as creditos
@@ -889,6 +1022,7 @@
 						$condTipo) as t
 				group by
 					t.idmon,
+					t.siglas,
 					t.nommon) as x
 			order by
 				x.nommon";
@@ -975,5 +1109,186 @@
 
 		$conn->Close();
 		return getResultObject(true, '', $cursor);
+	}
+
+
+	/**
+	 * Carga el detalle de un cliente.
+	 */
+	function loadDetalleCliente($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$idemp = $jsonParams['idemp'];
+		$idmon = $jsonParams['idmon'];
+		$idcli = $jsonParams['idcli'];
+		$tipo = $jsonParams['tipo'];
+		$ver = $jsonParams['ver'];
+
+		if ($tipo == '0') {
+			$condTipo = 'true';
+		} else {
+			$condTipo = "c.tipo = '$tipo'";
+		}
+
+		$condPagado = 'true';
+		switch ($ver) {
+			case '0':
+				$condPagado = "c.pagado = '0'";
+				break;
+			case '1':
+				$condPagado = "c.pagado = '1'";
+				break;
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+		
+		$sqlCommand =
+			"select
+				t.*,
+				(t.debitos - t.creditos) as saldo
+			from
+				(select
+					c.*,
+					case
+						when c.tipo = '1' then 'PERSONAL'
+						when c.tipo = '2' then 'COMERCIAL'
+						else ''
+					end as tipotexto,
+					(select sum(d.monto) from cxcdet as d where d.idparent = c.id) as debitos,
+					coalesce((select sum(p.monto) from cxcpag as p where p.idparent = c.id), 0) as creditos
+				from
+					cxc as c
+				where
+					c.idemp = '$idemp' and
+					c.idmon = '$idmon' and
+					c.idcli = '$idcli' and
+					$condTipo and
+					$condPagado) as t
+			order by
+				t.fecha";
+
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+		return getResultObject(true, '', $cursor);
+	}
+
+
+	/**
+	 * Carga el detalle de un documento y sus abonos.
+	 */
+	function loadDetalleAbonos($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		// Id del documento.
+		$id = $jsonParams['id'];
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$data = array();
+
+		// Carga el detalle.
+		$sqlCommand =
+			"select
+				t.*
+			from
+				cxcdet as t
+			where
+				t.idparent = '$id'
+			order by
+				t.id";
+
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$data['detalle'] = $cursor;
+
+		// Carga los abonos.
+		$sqlCommand =
+			"select
+				t.*
+			from
+				cxcpag as t
+			where
+				t.idparent = '$id'
+			order by
+				t.id";
+
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$data['abonos'] = $cursor;
+
+		$conn->Close();
+		return getResultObject(true, '', $data);
+	}
+
+
+	/**
+	 * Carga productos desde SAINT.
+	 */
+	function saintProductosLoad($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$codigo = $jsonParams['codigo'];
+
+		// Conecta con la tabla de productos local.
+		$dbInfo = getMySqlDbInfo('saiverdb');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Carga los productos desde la tabla remota.
+		$sqlCommand =
+			"select
+				t.codprod as codigo,
+				t.descrip as descrip
+			from
+				saprod as t
+			where
+				t.codprod = '$codigo' or
+				t.refere = '$codigo' or
+				t.descrip like '%$codigo%'
+			order by
+				t.descrip";
+		$cursor = $conn->Query($sqlCommand);
+
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		$msg = count($cursor) . " Registros encontrados";
+		return getResultObject(true, $msg, $cursor);
 	}
 ?>
