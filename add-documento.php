@@ -75,6 +75,20 @@
                             <input type="text" class="txb txb-str" name="descrip" maxlength="50" autocomplete="off">
                         </div>
                     </div>
+                    <div class="hsep10"></div>
+                    <div class="hsep10"></div>
+                    <div>
+                        <div>
+                            <span class="lbl">Tipo</span>
+                        </div>
+                        <div>
+                            <select name="tipo" class="txb">
+                                <option value="0">Seleccione</option>
+                                <option value="1">Personal</option>
+                                <option value="2">Comercial</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
 
@@ -94,19 +108,29 @@
                             <span class="icon icon-plus"></span>
                         </button>
                         <div class="vsep5"></div>
-                        <button class="btn btn-primary mini-btn">
+                        <button class="btn btn-primary mini-btn addDocumentoBtnEditItem">
                             <span class="icon icon-pencil"></span>
                         </button>
                         <div class="vsep5"></div>
-                        <button class="btn btn-danger mini-btn">
+                        <button class="btn btn-danger mini-btn addDocumentoBtnDeleteItem">
                             <span class="icon icon-bin"></span>
                         </button>
                     </div>
                 </div>
+                <div class="flex flex-right">
+                    <div>
+                        <span class="lbl">Total:</span>
+                    </div>
+                    <div class="hsep10"></div>
+                    <div>
+                        <input type="text" class="txb txb-num d2 m" name="total" disabled>
+                    </div>
+                    <div class="space"></div>
+                </div>
             </fieldset>
             <br>
             <div class="flex flex-right">
-                <button class="btn btn-info">Guardar</button>
+                <button class="btn btn-info addDocumentoBtnSave">Guardar</button>
                 <div class="hsep10"></div>
                 <button class="btn btn-dark addDocumentoBtnClose">Cancelar</button>
             </div>

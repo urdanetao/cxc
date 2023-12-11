@@ -4,7 +4,25 @@
  */
 function addDocumentoBtnSaveClick() {
     var f = '#' + core.form.dialog.getCurrent();
-    var params = core.data.restore(f, 'params');
+    var r = core.transform2Json(core.form.getData(f));
+    var d = core.grid.getAllRows($('.itemsBox', f));
+    var deletedItems = core.transform2Json(core.data.restore(f, 'deletedItems'));
+    var params = {
+        'r': r,
+        'd': d,
+        'deletedItems': deletedItems
+    };
+
+    core.showLoading();
+    core.apiFunction('documentosSave', params, (response) => {
+        core.hideLoading();
+        if (!response.status) {
+            core.showMessage(response.message, 4, core.color.error);
+            return;
+        }
+        core.showMessage(response.message, 4, core.color.success);
+        core.form.dialog.close();
+    });
 }
 
 /**
@@ -23,13 +41,22 @@ function addDocumentoShowItems(data) {
             {'title': 'TOTAL', 'field': 'monto', 'width': '100px', 'type': 'number', 'dataAlign': 'right', 'decimalPlaces': 2, 'thousandSep': true}
         ],
         'rows': data,
-        'showMaxRows': 8,
+        'showMaxRows': 7,
         'onClick': (t) => {
         }
     };
 
     var f = '#' + core.form.dialog.getCurrent();
     core.grid.build($(".itemsBox", f), gridStructure);
+
+    var total = 0;
+    for (var i = 0; i < Object.keys(data).length; i++) {
+        total += parseFloat(data[i].monto);
+    }
+
+    var r = core.transform2Json(core.form.getData(f));
+    r.total = total;
+    core.form.setData(f, r);
 }
 
 
@@ -41,62 +68,136 @@ function addDocumentoBtnAddItemClick() {
         id: core.getUniqueId()
     };
     core.form.dialog.show('./add-producto.php', params, () => {
-        var r = core.form.dialog.getBackwardData();
-        if (r.hasOwnProperty('addProducto') && r.addProducto == 1) {
-            // Toma todos los registros del grid.
-            var f = '#' + core.form.dialog.getCurrent();
-            var d = core.grid.getAllRows($('.itemsBox', f));
-            var i;
+        addDocumentoInsertUpdateItem();
+    });
+}
 
-            if (Object.keys(d).length > 0) {
-                // Recorre la lista de elementos.
-                var found = false;
-                for (i = 0; i < Object.keys(d).length; i++) {
-                    if (d[i].id == r.id) {
-                        found = true;
-                        break;
-                    }
-                }
+
+/**
+ * Edita el item seleccionado.
+ */
+function addDocumentoBtnEditItemClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var r = core.grid.getSelectedRow($('.itemsBox', f));
+
+    if (!r.hasOwnProperty('id')) {
+        core.showMessage('Debe seleccionar el item que desea editar', 4, core.color.info);
+        return;
+    }
     
-                if (!found) {
-                    i = Object.keys(d).length;
-                    d[i] = {};
+    core.form.dialog.show('./add-producto.php', r, () => {
+        addDocumentoInsertUpdateItem();
+    });
+}
+
+
+/**
+ * Inserta o actualiza un registro del grid.
+ */
+function addDocumentoInsertUpdateItem() {
+    var r = core.form.dialog.getBackwardData();
+    if (r.hasOwnProperty('addProducto') && r.addProducto == 1) {
+        // Toma todos los registros del grid.
+        var f = '#' + core.form.dialog.getCurrent();
+        var d = core.grid.getAllRows($('.itemsBox', f));
+        var i;
+
+        if (Object.keys(d).length > 0) {
+            // Recorre la lista de elementos.
+            var found = false;
+            for (i = 0; i < Object.keys(d).length; i++) {
+                if (d[i].id == r.id) {
+                    found = true;
+                    break;
                 }
-            } else {
-                i = 0;
-                d[i] = {};
             }
 
-            // Establece los valores del registro.
-            d[i].id = r.id;
-            d[i].codigo = r.codigo;
-            d[i].descrip = r.descrip;
-            d[i].precio = r.precio;
-            d[i].cantidad = r.cantidad;
-            d[i].monto = r.monto;
+            if (!found) {
+                i = Object.keys(d).length;
+                d[i] = {};
+            }
+        } else {
+            i = 0;
+            d[i] = {};
+        }
+
+        // Establece los valores del registro.
+        d[i].id = r.id;
+        d[i].codigo = r.codigo;
+        d[i].descrip = r.descrip;
+        d[i].precio = r.precio;
+        d[i].cantidad = r.cantidad;
+        d[i].monto = r.monto;
+
+        // Actualiza los datos del grid.
+        addDocumentoShowItems(d);
+    }
+}
+
+
+/**
+ * Elimina el item seleccionado.
+ */
+function addDocumentoBtnDeleteItemClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var r = core.grid.getSelectedRow($('.itemsBox', f));
+
+    if (!r.hasOwnProperty('id')) {
+        core.showMessage('Debe seleccionar el item que desea eliminar', 4, core.color.info);
+        return;
+    }
+
+    core.showConfirm({
+        'icon': 'icon icon-bin',
+        'title': 'Confirmar Eliminar Item',
+        'message': 'Se dispone a eliminar este item, ¿Esta seguro?',
+        'callbackOk': () => {
+            var f = '#' + core.form.dialog.getCurrent();
+            var d = core.grid.getAllRows($('.itemsBox', f));
+            var n = [];
+            var ni = 0;
+
+            for (var i = 0; i < Object.keys(d).length; i++) {
+                if (d[i].id == r.id) {
+                    continue;
+                }
+                n[ni] = d[i];
+                ni++;
+            }
+
+            // Si el item no es nuevo guarda el id.
+            if (r.id.length != 36) {
+                var deletedItems = core.data.restore(f, 'deletedItems');
+                var index = Object.keys(deletedItems).length;
+                deletedItems[index] = r.id;
+                core.data.save(f, 'deletedItems', deletedItems);
+            }
 
             // Actualiza los datos del grid.
-            addDocumentoShowItems(d);
+            addDocumentoShowItems(n);
         }
     });
 }
 
 
 /**
- * Carga los items del documento.
+ * Carga el registro completo del documento.
  */
-function addDocumentoLoadItems(id) {
+function addDocumentoLoad(id) {
     core.showLoading();
-    core.apiFunction('loadDetalleAbonos', {'id': id}, (response) => {
+    core.apiFunction('documentosLoad', {'id': id}, (response) => {
         core.hideLoading();
         if (!response.status) {
             core.showMessage(response.message, 4, core.color.error);
             return;
         }
 
+        var f = '#' + core.form.dialog.getCurrent();
+        core.form.setData(f, response.data.registro);
         addDocumentoShowItems(response.data.detalle);
     });
 }
+
 
 /**
  * On Load.
@@ -114,6 +215,16 @@ $(() => {
         addDocumentoBtnAddItemClick();
     });
 
+    $('.addDocumentoBtnEditItem', f).unbind('click');
+    $('.addDocumentoBtnEditItem', f).on('click', () => {
+        addDocumentoBtnEditItemClick();
+    });
+
+    $('.addDocumentoBtnDeleteItem', f).unbind('click');
+    $('.addDocumentoBtnDeleteItem', f).on('click', () => {
+        addDocumentoBtnDeleteItemClick();
+    });
+
     $('.addDocumentoBtnSave', f).unbind('click');
     $('.addDocumentoBtnSave', f).on('click', () => {
         addDocumentoBtnSaveClick();
@@ -124,11 +235,17 @@ $(() => {
         core.form.dialog.close();
     });
 
+    // Inicializa la lista de elementos eliminados.
+    core.data.save(f, 'deletedItems', []);
+
     // Establece la fecha del dia por defecto.
     var r = core.transform2Json(core.form.getData('.datosBox', f));
     r.fecha = core.getDate();
     core.form.setData($('.datosBox', f), r);
 
     addDocumentoShowItems([]);
-    addDocumentoLoadItems(params.id);
+
+    if (params.id != '') {
+        addDocumentoLoad(params.id);
+    }
 });

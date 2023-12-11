@@ -144,11 +144,6 @@
 			$response = loadDetalleCliente($jsonParams);
 			break;
 
-		// Obtiene el detalle de un documento y sus abonos.
-		case 'loadDetalleAbonos':
-			$response = loadDetalleAbonos($jsonParams);
-			break;
-
 		// Carga productos desde la base de datos SAINT.
 		case 'saintProductosLoad':
 			$response = saintProductosLoad($jsonParams);
@@ -157,6 +152,21 @@
 		// Busca productos desde la base de datos SAINT.
 		case 'saintProductosSearch':
 			$response = saintProductosSearch($jsonParams);
+			break;
+		
+		// Carga la cabecera y el detalle de un documento.
+		case 'documentosLoad':
+			$response = documentosLoad($jsonParams);
+			break;
+
+		// Guarda una CxC.
+		case 'documentosSave':
+			$response = documentosSave($jsonParams);
+			break;
+		
+		// Elimina un documento.
+		case 'documentosDelete':
+			$response = documentosDelete($jsonParams);
 			break;
 	}
 	

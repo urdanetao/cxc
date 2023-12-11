@@ -68,9 +68,9 @@ function addProductoSearchByText() {
 
 
 /**
- * Guarda el registro.
+ * Agrega o actualiza el producto en la lista.
  */
-function addProductoBtnGuardarClick() {
+function addProductoBtnOkClick() {
     var f = '#' + core.form.dialog.getCurrent();
     var r = core.transform2Json(core.form.getData(f));
 
@@ -162,9 +162,9 @@ $(() => {
         addProductoCalculaTotal();
     });
 
-    $('.addProductoBtnGuardar', f).unbind('click');
-    $('.addProductoBtnGuardar', f).on('click', () => {
-        addProductoBtnGuardarClick();
+    $('.addProductoBtnOk', f).unbind('click');
+    $('.addProductoBtnOk', f).on('click', () => {
+        addProductoBtnOkClick();
     });
 
     $('.addProductoBtnCancelar', f).unbind('click');

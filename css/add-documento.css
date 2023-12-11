@@ -1,4 +1,8 @@
 
+.space {
+    width: 45px;
+}
+
 .datosBox input[name="descrip"] {
     width: 368px;
 }
@@ -18,4 +22,8 @@
 .detalleBox input[name="precio"],
 .detalleBox input[name="monto"] {
     width: 100px;
+}
+
+.detalleBox input[name="total"] {
+    width: 115px;
 }

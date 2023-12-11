@@ -67,7 +67,7 @@
                 </div>
                 <br>
                 <div class="flex flex-right">
-                    <button class="btn btn-info addProductoBtnGuardar">Guardar</button>
+                    <button class="btn btn-info addProductoBtnOk">Ok</button>
                     <div class="hsep10"></div>
                     <button class="btn btn-dark addProductoBtnCancelar">Cancelar</button>
                 </div>

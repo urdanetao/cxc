@@ -40,7 +40,7 @@ function showDetalleCliente(data) {
         'showMaxRows': 6,
         'onClick': (t) => {
             core.showLoading();
-            core.apiFunction('loadDetalleAbonos', {id: t.id}, (response) => {
+            core.apiFunction('documentosLoad', {id: t.id}, (response) => {
                 core.hideLoading();
                 if (!response.status) {
                     core.showMessage(response.message, 4, core.color.error);
@@ -116,6 +116,92 @@ function showAbonos(data) {
     core.grid.build($(".detalleAbonosBox", f), gridStructure);
 }
 
+
+/**
+ * Agrega un documento.
+ */
+function cxcDetalleBtnAddDocumentoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var r = core.transform2Json(core.form.getData(f));
+    var params = {
+        id: '',
+        idemp: r.idemp,
+        nomemp: r.nomemp,
+        idcli: r.idcli,
+        nomcli: r.nomcli,
+        idmon: r.idmon,
+        siglas: r.siglas,
+        nommon: r.nommon
+    };
+    
+    core.form.dialog.show('./add-documento.php', params, () => {
+        loadDetalleCliente();
+    });
+}
+
+
+/**
+ * Edita un documento.
+ */
+function cxcDetalleBtnEditDocumentoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var r = core.transform2Json(core.form.getData(f));
+    var item = core.grid.getSelectedRow($('.detalleGeneralClienteBox', f));
+
+    if (!item.hasOwnProperty('id')) {
+        core.showMessage('Debe seleccionar el documento que desea editar', 4, core.color.info);
+        return;
+    }
+
+    var params = {
+        id: item.id,
+        idemp: r.idemp,
+        nomemp: r.nomemp,
+        idcli: r.idcli,
+        nomcli: r.nomcli,
+        idmon: r.idmon,
+        siglas: r.siglas,
+        nommon: r.nommon
+    };
+    
+    core.form.dialog.show('./add-documento.php', params, () => {
+        loadDetalleCliente();
+    });
+}
+
+
+/**
+ * Elimina un documento.
+ */
+function cxcDetalleBtnDeleteDocumentoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var item = core.grid.getSelectedRow($('.detalleGeneralClienteBox', f));
+
+    if (!item.hasOwnProperty('id')) {
+        core.showMessage('Debe seleccionar el documento que desea eliminar', 4, core.color.info);
+        return;
+    }
+
+    core.showConfirm({
+        'icon': 'icon icon-bin',
+        'title': 'Confirmar Eliminar Documento',
+        'message': 'Se dispone a liminar el documento completo con su detalle y abonos, ¿esta seguro?',
+        'callbackOk': () => {
+            core.showLoading();
+            core.apiFunction('documentosDelete', {'id': item.id}, (response) => {
+                core.hideLoading();
+                if (!response.status) {
+                    core.showMessage(response.message, 4, core.color.error);
+                    return;
+                }
+                core.showMessage(response.message, 4, core.color.success);
+                loadDetalleCliente();
+            });
+        }
+    });
+}
+
+
 /**
  * On Load.
  */
@@ -134,20 +220,17 @@ $(() => {
 
     $('.cxcDetalleBtnAddDocumento', f).unbind('click');
     $('.cxcDetalleBtnAddDocumento', f).on('click', () => {
-        var f = '#' + core.form.dialog.getCurrent();
-        var r = core.transform2Json(core.form.getData(f));
-        var params = {
-            id: '',
-            idemp: r.idemp,
-            nomemp: r.nomemp,
-            idcli: r.idcli,
-            nomcli: r.nomcli,
-            idmon: r.idmon,
-            siglas: r.siglas,
-            nommon: r.nommon
-        };
-        
-        core.form.dialog.show('./add-documento.php', params);
+        cxcDetalleBtnAddDocumentoClick();
+    });
+
+    $('.cxcDetalleBtnEditDocumento', f).unbind('click');
+    $('.cxcDetalleBtnEditDocumento', f).on('click', () => {
+        cxcDetalleBtnEditDocumentoClick();
+    });
+
+    $('.cxcDetalleBtnDeleteDocumento', f).unbind('click');
+    $('.cxcDetalleBtnDeleteDocumento', f).on('click', () => {
+        cxcDetalleBtnDeleteDocumentoClick();
     });
 
     $('.cxcDetalleBtnCerrar', f).unbind('click');

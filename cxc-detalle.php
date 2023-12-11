@@ -93,11 +93,11 @@
                             <span class="icon icon-plus"></span>
                         </button>
                         <div class="vsep5"></div>
-                        <button class="btn btn-primary mini-btn">
+                        <button class="btn btn-primary mini-btn cxcDetalleBtnEditDocumento">
                             <span class="icon icon-pencil"></span>
                         </button>
                         <div class="vsep5"></div>
-                        <button class="btn btn-danger mini-btn">
+                        <button class="btn btn-danger mini-btn cxcDetalleBtnDeleteDocumento">
                             <span class="icon icon-bin"></span>
                         </button>
                     </div>

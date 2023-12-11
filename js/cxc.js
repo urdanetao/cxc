@@ -131,7 +131,9 @@ function showResumenCliente(data) {
             r.nommon = m.nommon;
             r.idcli = t.idcli;
             r.nomcli = t.nomcli;
-            core.form.dialog.show('./cxc-detalle.php', r);
+            core.form.dialog.show('./cxc-detalle.php', r, () => {
+                loadResumenCliente(m.idmon);
+            });
         }
     };
 

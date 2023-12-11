@@ -336,7 +336,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -442,7 +442,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -614,7 +614,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -719,7 +719,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -842,7 +842,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -947,7 +947,7 @@
 		}
 
 		// Inicia la transaccion.
-		if ($conn->Query('start transaction;') === false) {
+		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
@@ -1186,9 +1186,54 @@
 
 
 	/**
-	 * Carga el detalle de un documento y sus abonos.
+	 * Carga productos desde SAINT.
 	 */
-	function loadDetalleAbonos($jsonParams) {
+	function saintProductosLoad($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$codigo = $jsonParams['codigo'];
+
+		// Conecta con la tabla de productos local.
+		$dbInfo = getMySqlDbInfo('saiverdb');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Carga los productos desde la tabla remota.
+		$sqlCommand =
+			"select
+				t.codprod as codigo,
+				t.descrip as descrip
+			from
+				saprod as t
+			where
+				t.codprod = '$codigo' or
+				t.refere = '$codigo' or
+				t.descrip like '%$codigo%'
+			order by
+				t.descrip";
+		$cursor = $conn->Query($sqlCommand);
+
+		if ($cursor === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		$msg = count($cursor) . " Registros encontrados";
+		return getResultObject(true, $msg, $cursor);
+	}
+
+
+	/**
+	 * Carga un documento con su detalle y abonos.
+	 */
+	function documentosLoad($jsonParams) {
 		if (!isset($_SESSION['user'])) {
 			return getResultObject(false, 'Acceso denegado');
 		}
@@ -1204,6 +1249,22 @@
 		}
 
 		$data = array();
+
+		// Carga la cabecera.
+		$sqlCommand = "select t.* from cxc as t where t.id = '$id';";
+		$result = $conn->Query($sqlCommand);
+
+		if ($result === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) == 0) {
+			$conn->Close();
+			return getResultObject(false, 'No se encuentra el registro');
+		}
+
+		$data['registro'] = $result[0];
 
 		// Carga el detalle.
 		$sqlCommand =
@@ -1249,46 +1310,255 @@
 
 
 	/**
-	 * Carga productos desde SAINT.
+	 * Guarda una CxC.
 	 */
-	function saintProductosLoad($jsonParams) {
+	function documentosSave($jsonParams) {
 		if (!isset($_SESSION['user'])) {
 			return getResultObject(false, 'Acceso denegado');
 		}
 
-		$codigo = $jsonParams['codigo'];
+		$r = $jsonParams['r'];
 
-		// Conecta con la tabla de productos local.
-		$dbInfo = getMySqlDbInfo('saiverdb');
+		if (isset($jsonParams['d'])) {
+			$d = $jsonParams['d'];
+		} else {
+			$d = array();
+		}
+
+		if (isset($jsonParams['deletedItems'])) {
+			$deletedItems = $jsonParams['deletedItems'];
+		} else {
+			$deletedItems = array();
+		}
+
+		// Procesa la cabecera.
+		$id = $r['id'];
+		$idemp = $r['idemp'];
+		$idmon = $r['idmon'];
+		$idcli = $r['idcli'];
+		$tipo = $r['tipo'];
+		$fecha = $r['fecha'];
+		$descrip = $r['descrip'];
+
+		if ($idemp == '') {
+			return getResultObject(false, 'No hay empresa seleccionada');
+		}
+		if ($idmon == '') {
+			return getResultObject(false, 'No hay moneda seleccionada');
+		}
+		if ($idcli == '') {
+			return getResultObject(false, 'No hay cliente seleccionado');
+		}
+		if ($fecha == '') {
+			return getResultObject(false, 'Debe indicar la fecha de la transacción');
+		}
+		if ($descrip == '') {
+			return getResultObject(false, 'Debe indicar una descripcion para la transacción');
+		}
+		if ($tipo == '0') {
+			return getResultObject(false, 'Debe indicar el tipo de transacción');
+		}
+
+		// Si no hay registros en el detalle.
+		if (count($d) == 0) {
+			return getResultObject(false, 'No hay ningún item registrado en el documento');
+		}
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
 		$conn = new MySqlDataManager($dbInfo);
 
 		if (!$conn->IsConnected()) {
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
 
-		// Carga los productos desde la tabla remota.
-		$sqlCommand =
-			"select
-				t.codprod as codigo,
-				t.descrip as descrip
-			from
-				saprod as t
-			where
-				t.codprod = '$codigo' or
-				t.refere = '$codigo' or
-				t.descrip like '%$codigo%'
-			order by
-				t.descrip";
-		$cursor = $conn->Query($sqlCommand);
+		// Inicia una transaccion.
+		if ($conn->Query('start transaction read write;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
 
-		if ($cursor === false) {
+		// Si el registro es nuevo.
+		if ($id == '') {
+			// Busca el siguiente correlativo.
+			$sqlCommand = "select t.id from cxc as t order by t.id desc limit 1";
+			$result = $conn->Query($sqlCommand);
+
+			if ($result === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+
+			if (count($result) == 0) {
+				$id = 1;
+			} else {
+				$id = intval($result[0]['id']) + 1;
+			}
+
+			// Agrega el registro.
+			$sqlCommand =
+				"insert into cxc (
+					id, idemp, idmon, idcli, tipo, fecha, descrip, pagado)
+				values (
+					'$id', '$idemp', '$idmon', '$idcli', '$tipo', '$fecha', '$descrip', '0');";
+		} else {
+			// Actualiza el registro.
+			$sqlCommand =
+				"update cxc set
+					tipo = '$tipo',
+					fecha = '$fecha',
+					descrip = '$descrip'
+				where
+					id = '$id'";
+		}
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Procesa el detalle.
+		$idparent = $id;
+		for ($i = 0; $i < count($d); $i++) {
+			// Toma los valores del registro.
+			$iditem = $d[$i]['id'];
+			$codigo = $d[$i]['codigo'];
+			$descrip = $d[$i]['descrip'];
+			$precio = $d[$i]['precio'];
+			$cantidad = $d[$i]['cantidad'];
+			$monto = $d[$i]['monto'];
+
+			// Si el item es nuevo.
+			if (strlen($iditem) == 36) {
+				// Busca el correlativo.
+				$sqlCommand = "select t.id from cxcdet as t order by t.id desc limit 1";
+				$result = $conn->Query($sqlCommand);
+
+				if ($result === false) {
+					$conn->Query('rollback;');
+					$conn->Close();
+					return getResultObject(false, $conn->GetErrorMessage());
+				}
+
+				if (count($result) == 0) {
+					$iditem = 1;
+				} else {
+					$iditem = intval($result[0]['id']) + 1;
+				}
+
+				// Agrega el registro.
+				$sqlCommand =
+					"insert into cxcdet (
+						id, idparent, codigo, descrip, precio, cantidad, monto)
+					values (
+						'$iditem', '$id', '$codigo', '$descrip', '$precio', '$cantidad', '$monto');";
+			} else {
+				// Actualiza el regisro.
+				$sqlCommand =
+					"update cxcdet set
+						codigo = '$codigo',
+						descrip = '$descrip',
+						precio = '$precio',
+						cantidad = '$cantidad',
+						monto = '$monto'
+					where
+						id = '$iditem';";
+			}
+
+			if ($conn->Query($sqlCommand) === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+		}
+
+		// Procesa los items eliminados.
+		for ($i = 0; $i < count($deletedItems); $i++) {
+			$iditem = $deletedItems[$i];
+			$sqlCommand = "delete from cxcdet where id = '$iditem'";
+
+			if ($conn->Query($sqlCommand) === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
 
 		$conn->Close();
 
-		$msg = count($cursor) . " Registros encontrados";
-		return getResultObject(true, $msg, $cursor);
+		return getResultObject(true, 'Registro guardado con exito');
+	}
+
+
+	/**
+	 * Elimina un documento completo.
+	 */
+	function documentosDelete($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Inicia una transaccion.
+		if ($conn->Query('start transaction read write;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Elimina los abonos.
+		$sqlCommand = "delete from cxcpag where idparent = '$id';";
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Elimina el detalle del documento.
+		$sqlCommand = "delete from cxcdet where idparent = '$id';";
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Elimina el documento.
+		$sqlCommand = "delete from cxc where id = '$id';";
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, 'Registro eliminado con exito');
 	}
 ?>
