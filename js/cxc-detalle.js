@@ -203,6 +203,79 @@ function cxcDetalleBtnDeleteDocumentoClick() {
 
 
 /**
+ * Agrega un abono.
+ */
+function cxcDetalleBtnAddAbonoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var item = core.grid.getSelectedRow($('.detalleGeneralClienteBox', f));
+
+    if (!item.hasOwnProperty('id')) {
+        core.showMessage('Seleccione la transacción a la que desea abonar', 4, core.color.info);
+        return;
+    }
+
+    var params = {
+        'idparent': item.id,
+        'fecha': core.getDate()
+    };
+
+    core.form.dialog.show('./add-abono.php', params, () => {
+        loadDetalleCliente();
+    });
+}
+
+
+/**
+ * Edita un abono.
+ */
+function cxcDetalleBtnEditAbonoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var item = core.grid.getSelectedRow($('.detalleAbonosBox', f));
+
+    if (!item.hasOwnProperty('id')) {
+        core.showMessage('Seleccione el abono que desea editar', 4, core.color.info);
+        return;
+    }
+
+    core.form.dialog.show('./add-abono.php', item, () => {
+        loadDetalleCliente();
+    });
+}
+
+
+/**
+ * Elimina un abono.
+ */
+function cxcDetalleBtnDeleteAbonoClick() {
+    var f = '#' + core.form.dialog.getCurrent();
+    var item = core.grid.getSelectedRow($('.detalleAbonosBox', f));
+
+    if (!item.hasOwnProperty('id')) {
+        core.showMessage('Seleccione el abono que desea eliminar', 4, core.color.info);
+        return;
+    }
+
+    core.showConfirm({
+        'icon': 'icon icon-bin',
+        'title': 'Confirmar Eliminar Abono',
+        'message': 'Se dispone a eliminar este abono, ¿Esta seguro?',
+        'callbackOk': () => {
+            core.showLoading();
+            core.apiFunction('abonosDelete', item, (response) => {
+                core.hideLoading();
+                if (!response.status) {
+                    core.showMessage(response.message, 4, core.color.error);
+                    return;
+                }
+                core.showMessage(response.message, 4, core.color.success);
+                loadDetalleCliente();
+            });
+        }
+    });
+}
+
+
+/**
  * On Load.
  */
 $(() => {
@@ -237,6 +310,21 @@ $(() => {
     $('.cxcDetalleBtnCerrar', f).on('click', () => {
         core.form.dialog.close();
     });
+
+    $('.cxcDetalleBtnAddAbono', f).unbind('click');
+    $('.cxcDetalleBtnAddAbono', f).on('click', () => {
+        cxcDetalleBtnAddAbonoClick();
+    })
+
+    $('.cxcDetalleBtnEditAbono', f).unbind('click');
+    $('.cxcDetalleBtnEditAbono', f).on('click', () => {
+        cxcDetalleBtnEditAbonoClick();
+    })
+
+    $('.cxcDetalleBtnDeleteAbono', f).unbind('click');
+    $('.cxcDetalleBtnDeleteAbono', f).on('click', () => {
+        cxcDetalleBtnDeleteAbonoClick();
+    })
 
     showDetalleCliente([]);
     loadDetalleCliente();

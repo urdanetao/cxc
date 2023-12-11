@@ -1,0 +1,12 @@
+
+.addAbono input[name="descrip"] {
+    width: 350px;
+}
+
+.addAbono input[name="monto"] {
+    width: 120px;
+}
+
+.addAbonoButtonsBox button {
+    width: 80px;
+}

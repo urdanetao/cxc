@@ -168,6 +168,16 @@
 		case 'documentosDelete':
 			$response = documentosDelete($jsonParams);
 			break;
+		
+		// Guarda un abono.
+		case 'abonosSave':
+			$response = abonosSave($jsonParams);
+			break;
+
+		// Elimina un abono.
+		case 'abonosDelete':
+			$response = abonosDelete($jsonParams);
+			break;
 	}
 	
 	$jsonData = json_encode($response, JSON_INVALID_UTF8_IGNORE + JSON_UNESCAPED_UNICODE);

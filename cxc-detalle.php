@@ -121,15 +121,15 @@
                         <div class="hsep10"></div>
                         <div>
                             <div class="spaceVert"></div>
-                            <button class="btn btn-info mini-btn">
+                            <button class="btn btn-info mini-btn cxcDetalleBtnAddAbono">
                                 <span class="icon icon-plus"></span>
                             </button>
                             <div class="vsep5"></div>
-                            <button class="btn btn-primary mini-btn">
+                            <button class="btn btn-primary mini-btn cxcDetalleBtnEditAbono">
                                 <span class="icon icon-pencil"></span>
                             </button>
                             <div class="vsep5"></div>
-                            <button class="btn btn-danger mini-btn">
+                            <button class="btn btn-danger mini-btn cxcDetalleBtnDeleteAbono">
                                 <span class="icon icon-bin"></span>
                             </button>
                         </div>

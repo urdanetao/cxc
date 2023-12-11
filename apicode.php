@@ -1561,4 +1561,229 @@
 
 		return getResultObject(true, 'Registro eliminado con exito');
 	}
+
+
+	/**
+	 * Guarda un abono.
+	 */
+	function abonosSave($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+		$idparent = $jsonParams['idparent'];
+		$fecha = $jsonParams['fecha'];
+		$descrip = $jsonParams['descrip'];
+		$monto = floatval($jsonParams['monto']);
+
+		// Valida los campos requeridos.
+		if ($idparent == '') {
+			return getResultObject(false, 'No hay codigo de transacción');
+		}
+
+		if ($fecha == '') {
+			return getResultObject(false, 'Debe indicar la fecha del abono');
+		}
+
+		if ($descrip == '') {
+			return getResultObject(false, 'Debe indicar una descripción para el abono');
+		}
+
+		if (floatval($monto) <= 0) {
+			return getResultObject(false, 'El monto del abono debe ser mayor a cero (0)');
+		}
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Inicia una transaccion.
+		if ($conn->Query('start transaction read write;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Si el abono existe busca el valor del monto original.
+		if ($id == '') {
+			$montoOriginal = 0;
+		} else {
+			$sqlCommand = "select t.monto from cxcpag as t where t.id = '$id'";
+			$result = $conn->Query($sqlCommand);
+
+			if ($result === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+
+			if (count($result) == 0) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, 'No existe el registro del abono');
+			}
+
+			$montoOriginal = floatval($result[0]['monto']);
+		}
+
+		// Busca el saldo del documento.
+		$sqlCommand =
+			"select
+				t.*,
+				(t.debitos - t.creditos) as saldo
+			from
+				(select
+					(select sum(t.monto) from cxcdet as t where t.idparent = '$idparent') as debitos,
+					coalesce((select sum(t.monto) from cxcpag as t where t.idparent = '$idparent'), 0) as creditos) as t";
+
+		$result = $conn->Query($sqlCommand);
+
+		if ($result === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) == 0) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, 'No se encuentra el registro del documento');
+		}
+		
+		$saldo = floatval($result[0]['saldo']) + $montoOriginal;
+
+		if ($monto > $saldo) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, 'El monto del abono supera el saldo del documento');
+		}
+		
+		// Establece el valor del campo "pagado".
+		if ($monto == $saldo) {
+			$pagado = 1;
+		} else {
+			$pagado = 0;
+		}
+
+		// Si el registro es nuevo.
+		if ($id == '') {
+			// Busca el correlativo.
+			$sqlCommand = "select t.id from cxcpag as t order by t.id desc limit 1";
+			$result = $conn->Query($sqlCommand);
+
+			if ($result === false) {
+				$conn->Query('rollback;');
+				$conn->Close();
+				return getResultObject(false, $conn->GetErrorMessage());
+			}
+
+			if (count($result) == 0) {
+				$id = 1;
+			} else {
+				$id = intval($result[0]['id']) + 1;
+			}
+
+			// Agrega el registro.
+			$sqlCommand =
+				"insert into cxcpag (
+					id, idparent, fecha, descrip, monto)
+				values (
+					'$id', '$idparent', '$fecha', '$descrip', '$monto')";
+		} else {
+			// Actualiza el registro.
+			$sqlCommand =
+				"update cxcpag set
+					fecha = '$fecha',
+					descrip = '$descrip',
+					monto = '$monto'
+				where
+					id = '$id';";
+		}
+
+		// Ejecuta el comando.
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Si debe marcar el documento como pagado.
+		$sqlCommand = "update cxc set pagado = '$pagado' where id = '$idparent';";
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, 'Registro guardado con exito');
+	}
+
+
+	/**
+	 * Elimina un abono.
+	 */
+	function abonosDelete($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$id = $jsonParams['id'];
+		$idparent = $jsonParams['idparent'];
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Inicia una transaccion.
+		if ($conn->Query('start transaction read write;') === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Elimina el abono.
+		$sqlCommand = "delete from cxcpag where id = '$id';";
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Actualiza el documento como "no pagado".
+		$sqlCommand = "update cxc set pagado = '0' where id = '$idparent';";
+
+		if ($conn->Query($sqlCommand) === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Finaliza la transaccion.
+		if ($conn->Query('commit;') === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, 'Registro eliminado con exito');
+	}
 ?>

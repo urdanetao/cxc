@@ -4214,6 +4214,18 @@ class Core {
     			case 'number':
     				data[columnName] = this.format.numberUnFormat($(columns[i]).find("div").find("span").text());
     				break;
+                
+                case 'date':
+                    var texto = $(columns[i]).find("div").find("span").text();
+                    if (texto == '' || texto.length != 10) {
+                        data[columnName] = '';
+                    } else {
+                        data[columnName] =
+                            texto.substring(6) + this.format.dateSqlSep +
+                            texto.substring(3, 5) + this.format.dateSqlSep +
+                            texto.substring(0, 2);
+                    }
+    				break;
 
     			default:
     				data[columnName] = $(columns[i]).find("div").find("span").text();
