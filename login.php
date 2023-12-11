@@ -9,13 +9,17 @@
     <div class="loginBox">
         <div class="window">
             <div class="windowTitle">
-                <h6>Acceso al Sistema</h6>
+                <h6>Login</h6>
             </div>
             <div class="windowBox">
                 <div class="loginLogoBox flex flex-hcenter">
                     <span class="icon icon-user"></span>
                 </div>
-                <br>
+                <div class="vsep10"></div>
+                <div class="flex flex-hcenter">
+                    <h5>Acceso al Sistema</h5>
+                </div>
+                <div class="vsep10"></div>
                 <div class="flex flex-hcenter">
                     <div>
                         <div>
