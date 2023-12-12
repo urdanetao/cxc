@@ -48,7 +48,7 @@
                             <div class="resumenMonedaBox"></div>
                             <br>
                             <div class="flex flex-hcenter">
-                                <button class="btn btn-info">Agregar Transacción</button>
+                                <button class="btn btn-info cxcBtnAddTransaction">Agregar Transacción</button>
                             </div>
                         </fieldset>
                     </div>

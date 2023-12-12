@@ -29,9 +29,10 @@
                         <div>
                             <span class="lbl">Cliente</span>
                         </div>
-                        <div>
+                        <div class="flex">
                             <input type="text" class="txb" name="idcli" hidden>
                             <input type="text" class="txb" name="nomcli" disabled>
+                            <div class="flex extraDataCliente"></div>
                         </div>
                     </div>
                     <div class="hsep10"></div>

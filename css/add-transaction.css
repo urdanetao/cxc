@@ -1,0 +1,8 @@
+
+.addTransaction input[name="idmon"] {
+    width: 80px;
+}
+
+.addTransaction input[name="nomcli"] {
+    width: 300px;
+}

@@ -80,7 +80,7 @@ function addProductoBtnOkClick() {
         return;
     }
 
-    if (parseFloat(r.precio) < 1) {
+    if (parseFloat(r.precio) < 0.01) {
         core.showMessage('El precio del item debe ser mayor a cero (0)', 4, core.color.error);
         return;
     }

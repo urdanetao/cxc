@@ -282,7 +282,7 @@ $(() => {
     // Toma los parametros enviados al formulario.
     var f = '#' + core.form.dialog.getCurrent();
     var params = core.data.restore(f, 'params');
-    
+
     core.form.setData(f, params);
     core.linkNativeEvents(f);
 

@@ -248,6 +248,37 @@ function loadResumenCliente(idmon) {
 
 
 /**
+ * Agrega una nueva transaccion.
+ */
+function cxcBtnAddTransactionClick() {
+    var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+    r = core.transform2Json(core.form.getData(currentArea));
+
+    if (r.idemp == '0') {
+        core.showMessage('Debe seleccionar una empresa', 4, core.color.info);
+        return;
+    }
+
+    // Toma el nombre de la empresa.
+    r.nomemp = $('[name="idemp"] option:selected', currentArea).html();
+
+    core.form.dialog.show('./add-transaction.php', r, () => {
+        var r = core.form.dialog.getBackwardData();
+        if (r.hasOwnProperty('addTransactionOk') && r.addTransactionOk == 1) {
+            core.form.dialog.show('./cxc-detalle.php', r, () => {
+                var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+                var m = core.grid.getSelectedRow($('.resumenMonedaBox', currentArea));
+                if (!m.hasOwnProperty('idmon')) {
+                    m.idmon = 0;
+                }
+                loadResumenMoneda();
+            });
+        }
+    });
+}
+
+
+/**
  * On Load.
  */
 $(() => {
@@ -262,6 +293,11 @@ $(() => {
     $('.cxcBtnQuitarCliente', currentArea).unbind('click');
     $('.cxcBtnQuitarCliente', currentArea).click(() => {
         cxcClienteRemove();
+    })
+
+    $('.cxcBtnAddTransaction', currentArea).unbind('click');
+    $('.cxcBtnAddTransaction', currentArea).click(() => {
+        cxcBtnAddTransactionClick();
     })
 
     $('[name="idemp"]', currentArea).unbind('change');
