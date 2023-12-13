@@ -1,0 +1,19 @@
+
+.repGeneralSaldosBody {
+    width: 100%;
+    height: calc(100vh - 50px - 32px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.repGeneralSaldosBody select[name="idemp"] {
+    width: 300px;
+}
+
+.repGeneralSaldosBody input[name="nomcli"] {
+    width: 242px;
+}
+
+.repGeneralSaldosBody .repGeneralSaldosButtonsBox > button {
+    width: 80px;
+}

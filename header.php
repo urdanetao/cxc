@@ -11,7 +11,7 @@
             <div class="flex flex-vcenter">
                 <div class="headerLogoBox"></div>
                 <div class="hsep10"></div>
-                <h5>Saiver - Modulo CxC</h6>
+                <h5>Saiver - Modulo CxC</h5>
             </div>
         </div>
         <div class="headerRightSide">

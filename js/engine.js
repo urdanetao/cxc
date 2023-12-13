@@ -49,17 +49,11 @@ function showMenu() {
                 'command': () => {},
                 'options': [
                     {
-                        'text': 'Estado de Cuenta Cliente',
-                        'command': () => {
-
-                        }
-                    },
-                    {
                         'text': 'General de Saldos',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Reporte General de Saldos', './rep-general-saldos.php', true);
                         }
-                    },
+                    }
                 ]
             },
             {
