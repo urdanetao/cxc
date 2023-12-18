@@ -1,22 +1,6 @@
 <?php
 	require_once __DIR__ . '/mysql-data-manager.php';
-
-	define('__mysql_host', 'localhost');
-	define('__mysql_prefix', '');
-	define('__mysql_user', 'root');
-	define('__mysql_pwd', 'admin');
-	
-	// Configuración de conexión a MySQL.
-	function getMySqlDbInfo($dbname) {
-		$dbInfo = array();
-		$dbInfo['host'] = __mysql_host;
-		$dbInfo['prefix'] = __mysql_prefix;
-		$dbInfo['dbname'] = $dbname;
-		$dbInfo['user'] = __mysql_user;
-		$dbInfo['pwd'] = __mysql_pwd;
-
-		return $dbInfo;
-	}
+	require_once __DIR__ . '/dbinfo.php';
 
 	/**
 	 * Devuelve true en señal de que el server esta en linea.
@@ -1785,5 +1769,98 @@
 		$conn->Close();
 
 		return getResultObject(true, 'Registro eliminado con exito');
+	}
+
+
+	/**
+	 * Reporte general de saldos 01.
+	 */
+	function repGeneralSaldos01($params) {
+		$idemp = $params['idemp'];
+		$tipo = $params['tipo'];
+		$idcli = $params['idcli'];
+		$idmon = $params['idmon'];
+
+		// Condicion de empresa.
+		if ($idemp == '0') {
+			$whereEmpresa = 'true';
+		} else {
+			$whereEmpresa = "c.idemp = '$idemp'";
+		}
+
+		// Condicion tipo transaccion.
+		switch ($tipo) {
+			case '0':
+				$condicionTipo = 'true';
+				break;
+			case '1':
+				$condicionTipo = "c.tipo = '1'";
+				break;
+			case '2':
+				$condicionTipo = "c.tipo = '2'";
+				break;
+		}
+
+		// Condicion del cliente.
+		if ($idcli == '') {
+			$condicionCliente = 'true';
+		} else {
+			$condicionCliente = "c.idcli = '$idcli'";
+		}
+
+		// Condicion de la moneda.
+		if ($idmon == '0') {
+			$condicionMoneda = 'true';
+		} else {
+			$condicionMoneda = "c.idmon = $idmon";
+		}
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				t.*,
+				(t.debitos - t.creditos) as saldo
+			from
+				(select
+					c.*,
+					e.nombre as nomemp,
+					m.siglas as siglas,
+					m.nombre as nommon,
+					cl.nombre as nomcli,
+					(select sum(db.monto) from cxcdet as db where db.idparent = c.id) as debitos,
+					coalesce((select sum(cr.monto) from cxcpag as cr where cr.idparent = c.id), 0) as creditos
+				from
+					cxc as c
+					left join empresas as e on e.id = c.idemp
+					left join monedas as m on m.id = c.idmon
+					left join clientes as cl on cl.id = c.idcli
+				where
+					$whereEmpresa and
+					$condicionTipo and
+					$condicionCliente and
+					$condicionMoneda) as t
+			order by
+				t.idemp,
+				t.siglas,
+				t.nomcli,
+				t.fecha";
+	
+		$result = $conn->Query($sqlCommand);
+		
+		if ($result === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, '', $result);
 	}
 ?>

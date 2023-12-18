@@ -66,21 +66,7 @@
                         </div>
                     </div>
                 </fieldset>
-                <div class="vsep10"></div>
-                <fieldset>
-                    <legend>Reporte</legend>
-                    <div>
-                        <div>
-                            <span class="lbl">Tipo de Reporte</span>
-                        </div>
-                        <div>
-                            <select name="tipoReporte" class="txb">
-                                <option value="1">Reporte Resumido</option>
-                                <option value="2">Reporte Detallado</option>
-                            </select>
-                        </div>
-                    </div>
-                </fieldset>
+                
                 <br>
                 <div class="flex flex-right repGeneralSaldosButtonsBox">
                     <button class="btn btn-info repGeneralSaldosBtnPrint">Imprimir</button>

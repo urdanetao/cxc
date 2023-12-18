@@ -93,9 +93,9 @@
         return $monthName;
     }
 
-    // 
-    // Convierte una fecha con formato yyyy-mm-dd en dd-mm-yyyy.
-    // 
+    /**
+     * Convierte una fecha con formato yyyy-mm-dd en dd-mm-yyyy.
+     */
     function reverseDate($date) {
         $result = '';
 
@@ -109,9 +109,26 @@
         return $result;
     }
 
-    // 
-    // Calcula la diferencia de dias entre 2 fechas.
-    // 
+
+    /**
+     * Trunca una cadena a un numero de caracteres incluyendo la terminacion '...'.
+     */
+    function truncateString($str, $maxLength, $setEllipsis = true) {
+        if ($setEllipsis) {
+            $str = substr($str, 0, $maxLength - 3);
+            if (strlen($str) == $maxLength - 3) {
+                $str .= '...';
+            }
+        } else {
+            $str = substr($str, 0, $maxLength);
+        }
+
+        return $str;
+    }
+
+    /**
+     * Calcula la diferencia de dias entre 2 fechas.
+     */
     function getDaysBetween2Dates(DateTime $date1, DateTime $date2, $absolute = false) {
         $interval = $date2->diff($date1);
         return (!$absolute and $interval->invert) ? - $interval->days : $interval->days;

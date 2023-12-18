@@ -107,7 +107,15 @@ function repGeneralSaldosBtnQuitarClienteClick() {
 function repGeneralSaldosBtnPrintClick() {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     var r = core.transform2Json(core.form.getData(currentArea));
-    console.log(r);
+    r.nomemp = $('select[name="idemp"] option:selected', currentArea).html();
+    r.nomtipo = $('select[name="tipo"] option:selected', currentArea).html();
+    r.siglas = $('select[name="idmon"] option:selected', currentArea).html();
+
+    core.showLoading();
+    core.apiFunction('prepare-report', r, function(response) {
+        core.hideLoading();
+        window.open('./pdf-general-saldos_01.php');
+    });
 }
 
 /**

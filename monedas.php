@@ -32,7 +32,7 @@
                         <span class="lbl">Siglas</span>
                     </div>
                     <div class="flex">
-                        <input type="text" class="txb txb-str enable-editing" name="siglas" maxlegth="3" autocomplete="off">
+                        <input type="text" class="txb txb-str enable-editing" name="siglas" maxlength="3" autocomplete="off">
                         <div class="hsep5"></div>
                         <button class="btn btn-dark mini-btn btnMonedasSearch">
                             <span class="icon icon-search"></span>
@@ -45,7 +45,7 @@
                         <span class="lbl">Nombre</span>
                     </div>
                     <div>
-                        <input type="text" class="txb txb-str enable-editing" name="nombre" maxlegth="20" autocomplete="off">
+                        <input type="text" class="txb txb-str enable-editing" name="nombre" maxlength="20" autocomplete="off">
                     </div>
                 </div>
                 <br>

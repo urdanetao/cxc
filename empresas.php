@@ -32,7 +32,7 @@
                         <span class="lbl">Nombre</span>
                     </div>
                     <div class="flex">
-                        <input type="text" class="txb txb-str enable-editing" name="nombre" maxlegth="30" autocomplete="off">
+                        <input type="text" class="txb txb-str enable-editing" name="nombre" maxlength="30" autocomplete="off">
                         <div class="hsep5"></div>
                         <button class="btn btn-dark mini-btn btnEmpresasSearch">
                             <span class="icon icon-search"></span>
