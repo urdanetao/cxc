@@ -64,13 +64,13 @@ function showMenu() {
                     {
                         'text': 'Cambiar E-Mail',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Cambio de Correo Electrónico', './change-email.php', true);
                         }
                     },
                     {
                         'text': 'Cambiar Contraseña',
                         'command': () => {
-
+                            core.tabs.build('.engineBodyWorkArea', 'Cambio de Contraseña', './change-pwd.php', true);
                         }
                     },
                     {
