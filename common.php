@@ -163,7 +163,7 @@
 		$Mail->Helo        = "smtp.almacenadorasaiver.com";
 		$Mail->Port        = 465;
 		$Mail->Username    = 'soporte@almacenadorasaiver.com';
-		$Mail->Password    = 'soporte12345**';
+		$Mail->Password    = '';
 		$Mail->Priority    = 1;
 		$Mail->CharSet     = 'UTF-8';
 		$Mail->Encoding    = '8bit';
