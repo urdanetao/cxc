@@ -59,16 +59,16 @@
 			$response = logout();
 			break;
 		
-		// Carga la configuracion.
-		case 'configLoad':
-			$response = configLoad();
+		// Cambio de email - paso 1.
+		case 'changeEmail01':
+			$response = changeEmail01($jsonParams);
 			break;
 			
-		// Guarda la configuracion.
-		case 'configSave':
-			$response = configSave($jsonParams);
+		// Cambio de email - paso 2.
+		case 'changeEmail02':
+			$response = changeEmail02($jsonParams);
 			break;
-
+			
 		// Busca una moneda.
 		case 'monedasSearch':
 			$response = monedasSearch($jsonParams);

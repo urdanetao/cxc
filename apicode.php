@@ -120,94 +120,135 @@
 
 
 	/**
-	 * Carga la configuracion.
+	 * Cambio de email - paso 1.
 	 */
-	function configLoad() {
+	function changeEmail01($jsonParams) {
 		if (!isset($_SESSION['user'])) {
 			return getResultObject(false, 'Acceso denegado');
 		}
 
+		// Toma los parametros.
+		$pwd = $jsonParams['pwd'];
+		$email = $jsonParams['email'];
+
+		if ($pwd == '') {
+			return getResultObject(false, 'Debe indicar su contraseña');
+		}
+
+		if ($email == '') {
+			return getResultObject(false, 'Debe indicar la nueva direccion de correo electrónico');
+		}
+
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return getResultObject(false, 'El nuevo correo electrónico no es válido');
+		}
+
+		// Valida la contraseña.
 		$dbInfo = getMySqlDbInfo('cxc');
 		$conn = new MySqlDataManager($dbInfo);
 
 		if (!$conn->IsConnected()) {
 			return getResultObject(false, $conn->GetErrorMessage());
-		}
-		
-        $sqlCommand = "select t.* from config as t where t.id = '1'";
-        $cursor = $conn->Query($sqlCommand);
-
-		if ($cursor === false) {
-			$conn->Close();
-			return getResultObject(false, $conn->GetErrorMessage());
+			die();
 		}
 
-		// Si no existe el id lo agrega.
-		if (count($cursor) == 0) {
-			$sqlCommand =
-				"insert into config (
-					id, host, prefix, dbname, user, pwd)
-				values (
-					'1', '', '', '', '', '');";
-			if ($conn->Query($sqlCommand) === false) {
-				$conn->Close();
-				return getResultObject(false, $conn->GetErrorMessage());
-			}
+		// Busca el usuario.
+		$nickname = $_SESSION['user']['nickname'];
+		$sqlCommand = "select t.* from usuarios as t where t.nickname = '$nickname'";
+		$cursor = $conn->Query($sqlCommand);
 
-			$data['id'] = '1';
-			$data['host'] = '';
-			$data['prefix'] = '';
-			$data['dbname'] = '';
-			$data['user'] = '';
-			$data['pwd'] = '';
-		} else {
-			$data = $cursor[0];
-		}
+        if ($cursor === false) {
+            $msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
 
+        if (count($cursor) == 0) {
+			$msg = "El usuario '$nickname' no se encuentra registrado";
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+		// Finaliza la conexion.
 		$conn->Close();
 
-		return getResultObject(true, '', $data);
+		// Calcula el hash del password.
+		$pwdHashed = hash("sha3-512", $pwd);
+
+		if ($pwdHashed != $cursor[0]['pwd']) {
+			return getResultObject(false, 'La contraseña no es válida');
+		}
+
+		$pinCode = generatePin();
+
+		// Guarda la informacion temporal.
+		$_SESSION['userData'] = array(
+			'pinCode' => $pinCode,
+			'email' => $email
+		);
+
+		$userName = $_SESSION['user']['nombre'];
+
+		// sendMail retorna un objeto getResultObject.
+		$sent = sendMail(__DIR__ . '/templates/email-template.txt', 'Codigo de Seguridad', $email, $userName, $pinCode);
+
+		return $sent;
 	}
 
 
 	/**
-	 * Guarda la configuracion.
+	 * Cambio de email - paso 2.
 	 */
-	function configSave($jsonParams) {
-		$host = $jsonParams['host'];
-		$prefix = $jsonParams['prefix'];
-		$dbname = $jsonParams['dbname'];
-		$user = $jsonParams['user'];
-		$pwd = $jsonParams['pwd'];
+	function changeEmail02($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
 
-		// Calcula el hash del password.
-		// $pwdHashed = hash("sha3-512", $pwd);
+		if (!isset($_SESSION['userData']) || !isset($_SESSION['userData']['pinCode']) || !isset($_SESSION['userData']['email'])) {
+			die();
+		}
 
+		// Toma los parametros.
+		$pinCode = $jsonParams['pinCode'];
+
+		if ($pinCode == '') {
+			return getResultObject(false, 'Debe indicar el pin de seguridad');
+		}
+
+		$pinCode = $_SESSION['userData']['pinCode'];
+		$email = $_SESSION['userData']['email'];
+
+		if ($jsonParams['pinCode'] != $pinCode) {
+			return getResultObject(false, 'Codigo de seguridad inválido');
+		}
+
+		// Guarda el nuevo correo electronico.
 		$dbInfo = getMySqlDbInfo('cxc');
 		$conn = new MySqlDataManager($dbInfo);
 
 		if (!$conn->IsConnected()) {
 			return getResultObject(false, $conn->GetErrorMessage());
-		}
-		
-        $sqlCommand =
-            "update config set
-				host = '$host',
-				prefix = '$prefix',
-				dbname = '$dbname',
-				user = '$user',
-				pwd = '$pwd'
-			where
-				id = '1'";
-		if ($conn->Query($sqlCommand) === false) {
-			$conn->Close();
-			return getResultObject(false, $conn->GetErrorMessage());
+			die();
 		}
 
+		// Busca el usuario.
+		$nickname = $_SESSION['user']['nickname'];
+		$sqlCommand = "update usuarios set email = '$email' where nickname = '$nickname'";
+
+        if ($conn->Query($sqlCommand) === false) {
+            $msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+		// Finaliza la conexion.
 		$conn->Close();
 
-		return getResultObject(true, 'Registro guardado con exito');
+		unset($_SESSION['userData']);
+
+		return getResultObject(true, 'El correo electrónico ha sido cambiado con exito');
 	}
+
 
 	/**
 	 * Busca una moneda.

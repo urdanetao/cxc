@@ -1,0 +1,9 @@
+
+.changeEmail02Body p {
+    margin: 0px;
+    width: 500px;
+}
+
+.changeEmail02Body input[name="pinCode"] {
+    width: 80px;
+}

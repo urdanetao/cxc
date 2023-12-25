@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+        <title>
+            Validación de Correo Electrónico
+        </title>
+    </head>
+    <body>
+        <div class="mail-cnt">
+            <!-- Logotipo de Saver, C.A. -->
+            <div class="logo-cnt">
+                <img class="logo" src="https://almacenadorasaiver.com/img/logo-saiver.jpg">
+            </div>
+            <div class="tex-info">
+                <span>
+                    <a href="https://almacenadorasaiver.com/">
+                        almacenadorasaiver.com
+                    </a>
+                    - 2020/2023, contactos: soporte@almacenadorasaiver.com
+                </span>
+            </div>
+            <!-- Titulo -->
+            <div class="title-cnt">
+                <span>
+                    Validación de Correo Electrónico
+                </span>
+            </div>
+            <!-- Mensaje -->
+            <div class="message-cnt">
+                <div class="message">
+                    <p>
+                        Estimado usuario:
+                        <strong>
+                            {userName}
+                        </strong>
+                    </p>
+                    <p>
+                        Suministre el siguiente codigo en el sistema para validar su dirección correo electrónico cuando se le solicite.
+                    </p>
+                    <p>
+                        Su codigo de validación es:
+                        <strong>
+                            {pinCode}
+                        </strong>
+                    </p>
+                </div>
+            </div>
+            <!-- Mensaje de advertencia -->
+            <div class="ad-cnt">
+                <div class="ad">
+                    <p>
+                        <strong>
+                            Atención!
+                        </strong>
+                        <br>
+                            Ha recibido este mensaje porque ha realizado la solicitud de validar su correo electrónico en el sistema, si usted no ha realizado esta petición por favor reporte el caso inmediatamente a
+                            <a href="mailto:soporte@almacenadorasaiver.com">
+                                soporte@almacenadorasaiver.com
+                            </a>
+                        </br>
+                    </p>
+                </div>
+            </div>
+            <!-- Atentamente -->
+            <div class="att-cnt">
+                <div class="att">
+                    <div>
+                        <span>
+                            Atentamente
+                        </span>
+                    </div>
+                    <div>
+                        <span>
+                            El Equipo de Desarrollo de
+                            <a href="https://almacenadorasaiver.com">
+                                almacenadorasaiver.com
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<style type="text/css">
+    .logo-cnt {
+        width: 200px;
+        height: 200px;
+        margin: auto;
+    }
+
+    .logo {
+        width: 100%;
+        height: 100%;
+    }
+
+    span, p {
+        font-family: Helvetica,Arial,sans-serif;
+    }
+
+    .tex-info > span {
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .title-cnt {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .message-cnt, .ad-cnt {
+        display: flex;
+        justify-content: center;
+    }
+
+    .message, .ad {
+        width: 500px;
+    }
+
+    .att-cnt {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .ad {
+        font-size: 14px;
+    }
+
+    .att {
+        width: 500px;
+        display: flex;
+        justify-content: flex-end;
+        font-size: 14px;
+    }
+</style>

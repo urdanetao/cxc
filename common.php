@@ -1,11 +1,14 @@
 <?php
-    //
-    // Definicion de funciones generales.
-    //
+    /**
+     * Definicion de funciones generales.
+     */
+    use PHPMailer\PHPMailer\PHPMailer;
+	use PHPMailer\PHPMailer\SMTP;
+	use PHPMailer\PHPMailer\Exception;
 
-    // 
-    // Guarda un texto en el log.
-    // 
+    /**
+     * Guarda un texto en el log.
+     */
     function saveLog($text) {
         $file = fopen(__DIR__ . "/log.txt", "a");
         fwrite($file, $text . PHP_EOL);
@@ -133,6 +136,57 @@
         $interval = $date2->diff($date1);
         return (!$absolute and $interval->invert) ? - $interval->days : $interval->days;
     }
+
+
+    /**
+     * Envia un correo electronico con un codigo de validacion.
+     */
+    function sendMail($template, $subject, $email, $nombre, $pinCode) {
+		// Carga la plantilla de correo.
+		$sent = false;
+		$body = file_get_contents($template);
+
+		// Establece el nombre del usuario y el codigo de validacion.
+		$body = str_replace("{userName}", $nombre, $body);
+		$body = str_replace("{pinCode}", $pinCode, $body);
+
+		// Envia el correo electronico con el codigo de validacion.
+		require_once __DIR__ . '/PHPMailer/PHPMailer.php';
+		require_once __DIR__ . '/PHPMailer/SMTP.php';
+		require_once __DIR__ . '/PHPMailer/Exception.php';
+
+		$Mail = new PHPMailer();
+		$Mail->IsSMTP();
+		$Mail->Host        = 'mail.almacenadorasaiver.com';
+		$Mail->SMTPAuth    = true;
+		$Mail->SMTPSecure  = 'ssl';
+		$Mail->Helo        = "smtp.almacenadorasaiver.com";
+		$Mail->Port        = 465;
+		$Mail->Username    = 'soporte@almacenadorasaiver.com';
+		$Mail->Password    = 'soporte12345**';
+		$Mail->Priority    = 1;
+		$Mail->CharSet     = 'UTF-8';
+		$Mail->Encoding    = '8bit';
+		$Mail->Subject     = $subject;
+		$Mail->ContentType = 'text/html; charset=utf-8\r\n';
+		$Mail->From        = 'soporte@almacenadorasaiver.com';
+		$Mail->FromName    = "almacenadorasaiver.com";
+		$Mail->AddAddress($email, $nombre);
+		$Mail->isHTML(true);
+		$Mail->Body = $body;
+
+		if ($Mail->Send()) {
+			$sent = true;
+		}
+
+		$Mail->SmtpClose();
+
+		if ($sent) {
+			return getResultObject(true, "Correo enviado con exito");
+		}
+
+		return getResultObject(false, "No se ha podido enviar el email, intente mas tarde");
+	}
 
 
     //

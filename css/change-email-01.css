@@ -1,0 +1,20 @@
+
+.changeEmail01Body {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.changeEmail01Body p {
+    margin: 0px;
+    width: 500px;
+}
+
+.changeEmail01Body input[name="email"] {
+    width: 350px;
+}
+
+.changeEmail01Body input[name="pwd"] {
+    width: 120px;
+}
