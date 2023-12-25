@@ -1,0 +1,19 @@
+
+.setEmailBody {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.setEmailBody p {
+    width: 500px;
+}
+
+.setEmailBody input[name="email"] {
+    width: 350px;
+}
+
+.setEmailBody input[name="pinCode"] {
+    width: 80px;
+}

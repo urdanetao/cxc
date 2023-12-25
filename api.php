@@ -69,6 +69,16 @@
 			$response = changeEmail02($jsonParams);
 			break;
 			
+		// Cambio de contraseña.
+		case 'changePwd':
+			$response = changePwd($jsonParams);
+			break;
+			
+		// Envia un correo con el codigo de seguridad.
+		case 'sendEmail':
+			$response = sendEmail($jsonParams);
+			break;
+			
 		// Busca una moneda.
 		case 'monedasSearch':
 			$response = monedasSearch($jsonParams);

@@ -49,7 +49,20 @@
     <div class="indexBody">
         <?php
             if (isset($_SESSION['user'])) {
-                include __DIR__ . '/engine.php';
+                // Si el usuario no tiene mail registrado.
+                if ($_SESSION['user']['email'] == '') {
+                    include __DIR__ . '/set-email.php';
+                }
+
+                // Si el usuario tiene un password temporal.
+                elseif ($_SESSION['user']['chpwd'] == '1') {
+
+                }
+                
+                // Si todo ok.
+                else {
+                    include __DIR__ . '/engine.php';
+                }
             } else {
                 include __DIR__ . '/home.php';
             }

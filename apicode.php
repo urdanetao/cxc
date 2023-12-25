@@ -136,7 +136,7 @@
 		}
 
 		if ($email == '') {
-			return getResultObject(false, 'Debe indicar la nueva direccion de correo electrónico');
+			return getResultObject(false, 'Debe indicar la nueva dirección de correo electrónico');
 		}
 
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -231,7 +231,7 @@
 			die();
 		}
 
-		// Busca el usuario.
+		// Actualiza el correo electronico del usuario.
 		$nickname = $_SESSION['user']['nickname'];
 		$sqlCommand = "update usuarios set email = '$email' where nickname = '$nickname'";
 
@@ -241,12 +241,143 @@
             return getResultObject(false, $msg);
         }
 
+		// Carga nuevamente el registro del usuario en la sesion.
+		$sqlCommand = "select t.* from usuarios as t where t.nickname = '$nickname'";
+
+		$cursor = $conn->Query($sqlCommand);
+		if ($cursor === false) {
+            $msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+		if (count($cursor) == 0) {
+			$msg = 'Usuario no existe';
+            $conn->Close();
+            return getResultObject(false, $msg);
+		}
+
+		$_SESSION['user'] = $cursor[0];
+
 		// Finaliza la conexion.
 		$conn->Close();
 
 		unset($_SESSION['userData']);
 
 		return getResultObject(true, 'El correo electrónico ha sido cambiado con exito');
+	}
+
+
+	/**
+	 * Cambio de contraseña.
+	 */
+	function changePwd($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$pwd = $jsonParams['pwd'];
+		$pwdNew = $jsonParams['pwdNew'];
+		$pwdVerify = $jsonParams['pwdVerify'];
+
+		// Valida la contraseña actual.
+		if ($pwd == '') {
+			return getResultObject(false, 'Debe indicar su contraseña actual');
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+			die();
+		}
+
+		// Busca el usuario.
+		$nickname = $_SESSION['user']['nickname'];
+		$sqlCommand = "select t.* from usuarios as t where t.nickname = '$nickname'";
+		$cursor = $conn->Query($sqlCommand);
+
+        if ($cursor === false) {
+            $msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+        if (count($cursor) == 0) {
+			$msg = "El usuario '$nickname' no se encuentra registrado";
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+		// Calcula el hash del password actual.
+		$pwdHashed = hash("sha3-512", $pwd);
+
+		if ($pwdHashed != $cursor[0]['pwd']) {
+			$conn->Close();
+			return getResultObject(false, 'La contraseña no es válida');
+		}
+
+		// Valida la nueva contraseña.
+		if ($pwdNew == '') {
+			$conn->Close();
+			return getResultObject(false, 'Debe indicar una nueva contraseña');
+		}
+
+		if ($pwdNew != $pwdVerify) {
+			$conn->Close();
+			return getResultObject(false, 'No coincide la nueva contraseña con la verificación');
+		}
+
+		// Calcula el hash del nuevo password.
+		$pwdHashed = hash("sha3-512", $pwdNew);
+
+		$sqlCommand = "update usuarios set pwd = '$pwdHashed' where nickname = '$nickname'";
+		if ($conn->Query($sqlCommand) === false) {
+			$msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+		}
+
+		// Finaliza la conexion.
+		$conn->Close();
+
+		return getResultObject(true, 'Contraseña cambiada con exito');
+	}
+
+
+	/**
+	 * Envia un correo con el codigo de seguridad.
+	 */
+	function sendEmail($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$email = $jsonParams['email'];
+
+		if ($email == '') {
+			return getResultObject(false, 'Debe indicar la dirección de correo electrónico');
+		}
+
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return getResultObject(false, 'El correo electrónico no es válido');
+		}
+
+		$pinCode = generatePin();
+
+		// Guarda la informacion temporal.
+		$_SESSION['userData'] = array(
+			'pinCode' => $pinCode,
+			'email' => $email
+		);
+
+		$userName = $_SESSION['user']['nombre'];
+
+		// sendMail retorna un objeto getResultObject.
+		$sent = sendMail(__DIR__ . '/templates/email-template.txt', 'Codigo de Seguridad', $email, $userName, $pinCode);
+
+		return $sent;
 	}
 
 
