@@ -11,8 +11,10 @@
 </style>
 
 <!-- Cuerpo principal. -->
-<div class="inicioBody">
-
+<div class="startBody">
+    <div class="logoCxCBox">
+        <img src="./img/logo-cxc.png" alt="">
+    </div>
 </div>
 
 <!-- Javascript. -->

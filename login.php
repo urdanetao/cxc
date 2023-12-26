@@ -41,7 +41,7 @@
                         </div>
                         <div class="flex flex-right">
                             <div class="forgotPwdBox">
-                                <span class="lbl lbl-link">¿Olvidó su Contraseña?</span>
+                                <span class="lbl lbl-link loginBodyBtnForgotPwd">¿Olvidó su Contraseña?</span>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,11 @@
+
+.changeTmpPwdBody {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.changeTmpPwdBody p {
+    width: 500px;
+}

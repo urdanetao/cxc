@@ -74,9 +74,24 @@
 			$response = changePwd($jsonParams);
 			break;
 			
+		// Cambio de contraseña offline (recuperar contraseña).
+		case 'changePwdOffline':
+			$response = changePwdOffline($jsonParams);
+			break;
+			
+		// Cambio de contraseña temporal.
+		case 'changeTmpPwd':
+			$response = changeTmpPwd($jsonParams);
+			break;
+			
 		// Envia un correo con el codigo de seguridad.
 		case 'sendEmail':
 			$response = sendEmail($jsonParams);
+			break;
+			
+		// Envia un correo con el codigo de seguridad sin el usuario logueado.
+		case 'sendEmailOffline':
+			$response = sendEmailOffline($jsonParams);
 			break;
 			
 		// Busca una moneda.

@@ -23,7 +23,9 @@
         <div class="homeBodyMenuArea"></div>
 
         <!-- Area de trabajo -->
-        <div class="homeBodyWorkArea"></div>
+        <div class="homeBodyWorkArea">
+            <?php include __DIR__ . '/start.php'; ?>
+        </div>
     </div>
 </div>
 

@@ -56,7 +56,7 @@
 
                 // Si el usuario tiene un password temporal.
                 elseif ($_SESSION['user']['chpwd'] == '1') {
-
+                    include __DIR__ . '/change-tmp-pwd.php';
                 }
                 
                 // Si todo ok.

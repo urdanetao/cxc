@@ -3,7 +3,7 @@
  * Acceso del usuario al sistema.
  */
 function btnLoginClick() {
-    let r = core.transform2Json(core.form.getData('.loginBox'));
+    let r = core.transform2Json(core.form.getData('.loginBody'));
 
     core.showLoading();
     core.apiFunction('login', r, (response) => {
@@ -18,12 +18,27 @@ function btnLoginClick() {
     });
 }
 
+
+/**
+ * Carga la pantalla de recuperacion de contraseña.
+ */
+function loginBodyBtnForgotPwdClick() {
+    core.loadHTML('.homeBodyWorkArea', './forgot-pwd.php');
+}
+
 /**
  * On Load.
  */
 $(() => {
-    $('.btnLogin', '.loginBox').unbind('click');
-    $('.btnLogin', '.loginBox').click(() => {
+    core.linkNativeEvents('.loginBody');
+
+    $('.loginBodyBtnForgotPwd', '.loginBody').unbind('click');
+    $('.loginBodyBtnForgotPwd', '.loginBody').click(() => {
+        loginBodyBtnForgotPwdClick();
+    });
+    
+    $('.btnLogin', '.loginBody').unbind('click');
+    $('.btnLogin', '.loginBody').click(() => {
         btnLoginClick();
     });
 });

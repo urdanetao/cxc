@@ -347,6 +347,127 @@
 
 
 	/**
+	 * Cambio de contraseña offline (recuperar contraseña).
+	 */
+	function changePwdOffline($jsonParams) {
+		if (isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		if (!isset($_SESSION['userData']) || !isset($_SESSION['userData']['pinCode']) || !isset($_SESSION['userData']['email'])) {
+			die();
+		}
+		
+		$pinCode = $jsonParams['pinCode'];
+		$pwdNew = $jsonParams['pwdNew'];
+		$pwdVerify = $jsonParams['pwdVerify'];
+
+		// Valida el codigo de seguridad.
+		if ($pinCode == '') {
+			return getResultObject(false, 'Debe indicar el codigo de seguridad');
+		}
+
+		if ($pinCode != $_SESSION['userData']['pinCode']) {
+			return getResultObject(false, 'Código de seguridad inválido');
+		}
+
+		// Valida la nueva contraseña.
+		if ($pwdNew == '') {
+			return getResultObject(false, 'Debe indicar la nueva contraseña');
+		}
+
+		if ($pwdNew != $pwdVerify) {
+			return getResultObject(false, 'No coinciden las contraseñas');
+		}
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+			die();
+		}
+
+		// Calcula el hash del password actual.
+		$pwdHashed = hash("sha3-512", $pwdNew);
+
+		// Actualiza la contraseña del usuario.
+		$email = $_SESSION['userData']['email'];
+		$sqlCommand = "update usuarios set pwd = '$pwdHashed' where email = '$email'";
+		
+        if ($conn->Query($sqlCommand) === false) {
+            $msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+        }
+
+		// Finaliza la conexion.
+		$conn->Close();
+
+		unset($_SESSION['userData']);
+
+		return getResultObject(true, 'Contraseña establecida con exito');
+	}
+
+
+	/**
+	 * Cambio de contraseña temporal.
+	 */
+	function changeTmpPwd($jsonParams) {
+		if (!isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$pwdNew = $jsonParams['pwdNew'];
+		$pwdVerify = $jsonParams['pwdVerify'];
+
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		// Valida la nueva contraseña.
+		if ($pwdNew == '') {
+			$conn->Close();
+			return getResultObject(false, 'Debe indicar una nueva contraseña');
+		}
+
+		if ($pwdNew != $pwdVerify) {
+			$conn->Close();
+			return getResultObject(false, 'No coincide la nueva contraseña con la verificación');
+		}
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+			die();
+		}
+
+		// Calcula el hash del nuevo password.
+		$nickname = $_SESSION['user']['nickname'];
+		$pwdHashed = hash("sha3-512", $pwdNew);
+
+		$sqlCommand =
+			"update usuarios set
+				pwd = '$pwdHashed',
+				chpwd = '0'
+			where
+				nickname = '$nickname'";
+		if ($conn->Query($sqlCommand) === false) {
+			$msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+		}
+
+		// Finaliza la conexion.
+		$conn->Close();
+
+		// Establece los nuevos datos en la sesion.
+		$_SESSION['user']['pwd'] = $pwdHashed;
+		$_SESSION['user']['chpwd'] = '0';
+
+		return getResultObject(true, 'Contraseña temporal cambiada con exito');
+	}
+
+
+	/**
 	 * Envia un correo con el codigo de seguridad.
 	 */
 	function sendEmail($jsonParams) {
@@ -373,6 +494,69 @@
 		);
 
 		$userName = $_SESSION['user']['nombre'];
+
+		// sendMail retorna un objeto getResultObject.
+		$sent = sendMail(__DIR__ . '/templates/email-template.txt', 'Codigo de Seguridad', $email, $userName, $pinCode);
+
+		return $sent;
+	}
+
+
+	/**
+	 * Envia un correo con el codigo de seguridad sin el usuario logueado.
+	 */
+	function sendEmailOffline($jsonParams) {
+		if (isset($_SESSION['user'])) {
+			return getResultObject(false, 'Acceso denegado');
+		}
+
+		$email = $jsonParams['email'];
+
+		if ($email == '') {
+			return getResultObject(false, 'Debe indicar el correo electrónico asociado a la cuenta de usuario');
+		}
+
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return getResultObject(false, 'El correo electrónico no es válido');
+		}
+
+		// Busca el registro del usuario.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+		
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+			die();
+		}
+
+		$sqlCommand = "select t.* from usuarios as t where email = '$email'";
+		$result = $conn->Query($sqlCommand);
+				
+		if ($result === false) {
+			$msg = $conn->GetErrorMessage();
+            $conn->Close();
+            return getResultObject(false, $msg);
+		}
+
+		if (count($result) == 0) {
+			$msg = 'La dirección de correo electrónico no se encuentra registrada';
+            $conn->Close();
+            return getResultObject(false, $msg);
+		}
+
+		// Finaliza la conexion.
+		$conn->Close();
+
+		// Genera el codigo de seguridad.
+		$pinCode = generatePin();
+
+		// Guarda la informacion temporal.
+		$_SESSION['userData'] = array(
+			'pinCode' => $pinCode,
+			'email' => $email
+		);
+
+		$userName = $result[0]['nombre'];
 
 		// sendMail retorna un objeto getResultObject.
 		$sent = sendMail(__DIR__ . '/templates/email-template.txt', 'Codigo de Seguridad', $email, $userName, $pinCode);

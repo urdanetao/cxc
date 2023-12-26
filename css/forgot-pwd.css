@@ -1,0 +1,19 @@
+
+.forgotPwdBody {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.forgotPwdBody p {
+    width: 500px;
+}
+
+.forgotPwdBody input[name="email"] {
+    width: 350px;
+}
+
+.forgotPwdBody input[name="pinCode"] {
+    width: 80px;
+}
