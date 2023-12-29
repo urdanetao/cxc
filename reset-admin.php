@@ -1,8 +1,14 @@
 <?php
+    // Constantes.
+    define('__nickname', 'admin');
+    define('__nombre', 'OSCAR URDANETA');
+    define('__pwd', '12345');
+
+	require_once __DIR__ . '/common.php';
 	require_once __DIR__ . '/apicode.php';
 
     // Calcula el hash de la clave.
-    $clave = hash("sha3-512", 'admin');
+    $pwdHashed = hash("sha3-512", __pwd);
 
     // Conecta con la base de datos.
 	$dbInfo = getMySqlDbInfo('cxc');
@@ -22,8 +28,10 @@
         die();
     }
 
-    // Valida si existe el usuario 'admin'.
-	$sqlCommand = "select usuarios.* from usuarios where usuarios.nickname = 'admin'";
+    // Valida si existe el usuario.
+    $nickname = __nickname;
+    $nombre = __nombre;
+	$sqlCommand = "select usuarios.* from usuarios where usuarios.nickname = '$nickname'";
 	$cursor = $conn->Query($sqlCommand);
 
     if ($cursor === false) {
@@ -34,7 +42,7 @@
         die();
     }
 
-    // Si el usuario 'admin' no existe.
+    // Si el usuario no existe.
 	if (count($cursor) == 0) {
         // Busca el siguiente correlativo.
         $sqlCommand = "select t.* from usuarios as t order by t.id desc limit 1";
@@ -51,23 +59,26 @@
         if (count($cursor) == 0) {
             $id = 1;
         } else {
-            $id = intval($cursor['id']) + 1;
+            $id = intval($cursor[0]['id']) + 1;
         }
 
-        // Inserta el registro del usuario 'admin'.
+        // Inserta el registro del usuario.
 		$sqlCommand =
 			"insert into usuarios (
                 id, nickname, nombre, pwd,
 				email, chpwd)
 			values (
-				'$id', 'admin', 'OSCAR URDANETA', '$clave',
-				'oscarenriqueurdaneta@gmail.com', '0')";
+				'$id', '$nickname', '$nombre', '$pwdHashed',
+				'', '1')";
 	} else {
 		$sqlCommand =
 			"update usuarios set
-                pwd = '$clave'
+                nombre = '$nombre',
+                pwd = '$pwdHashed',
+                email = '',
+                chpwd = '1'
             where
-                nickname = 'admin'";
+                nickname = '$nickname'";
 	}
 
     // Ejecuta la consulta.
