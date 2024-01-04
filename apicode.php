@@ -909,10 +909,11 @@
 				empresas as t";
 
 		if ($unique) {
-			$sqlCommand .= "where t.id = '$id'";
+			$sqlCommand .= " where t.id = '$id'";
 		}
 
-		$sqlCommand .= ';';
+		$sqlCommand .= ' order by t.nombre;';
+		saveLog($sqlCommand);
 		$r = $conn->Query($sqlCommand);
 
 		if ($r === false) {
@@ -2135,7 +2136,12 @@
 		$idemp = $params['idemp'];
 		$tipo = $params['tipo'];
 		$idcli = $params['idcli'];
-		$idmon = $params['idmon'];
+
+		if (isset($params['idmon'])) {
+			$idmon = $params['idmon'];
+		} else {
+			$idmon = '0';
+		}
 
 		// Condicion de empresa.
 		if ($idemp == '0') {
