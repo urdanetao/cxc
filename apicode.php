@@ -787,6 +787,22 @@
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
 
+		// Valida que la moneda no se encuentre registrada en ninguna transaccion.
+		$sqlCommand = "select t.id from cxc as t where t.idmon = '$id' limit 1";
+		$result = $conn->Query($sqlCommand);
+		if ($result === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) > 0) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			$msg = 'Existen transacciones registradas con esta moneda, no se puede eliminar';
+			return getResultObject(false, $msg);
+		}
+
 		$sqlCommand = "delete from monedas where id = '$id'";
 		if ($conn->Query($sqlCommand) === false) {
 			$conn->Query('rollback;');
@@ -1065,6 +1081,22 @@
 			return getResultObject(false, $conn->GetErrorMessage());
 		}
 
+		// Valida que la empresa no tenga registrada ninguna transaccion.
+		$sqlCommand = "select t.id from cxc as t where t.idemp = '$id' limit 1";
+		$result = $conn->Query($sqlCommand);
+		if ($result === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) > 0) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			$msg = 'Existen transacciones registradas en esta empresa, no se puede eliminar';
+			return getResultObject(false, $msg);
+		}
+
 		$sqlCommand = "delete from empresas where id = '$id'";
 		if ($conn->Query($sqlCommand) === false) {
 			$conn->Query('rollback;');
@@ -1291,6 +1323,22 @@
 		if ($conn->Query('start transaction read write;') === false) {
 			$conn->Close();
 			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		// Valida que el cliente no tenga registrada ninguna transaccion.
+		$sqlCommand = "select t.id from cxc as t where t.idcli = '$id' limit 1";
+		$result = $conn->Query($sqlCommand);
+		if ($result === false) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		if (count($result) > 0) {
+			$conn->Query('rollback;');
+			$conn->Close();
+			$msg = 'Este cliente tiene transacciones registradas, no se puede eliminar';
+			return getResultObject(false, $msg);
 		}
 
 		$sqlCommand = "delete from clientes where id = '$id'";
