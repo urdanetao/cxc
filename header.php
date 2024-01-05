@@ -15,7 +15,11 @@
             </div>
         </div>
         <div class="headerRightSide">
-
+            <?php
+                if (isset($_SESSION['user'])) {
+                    include __DIR__ . '/header-user-info.php';
+                }
+            ?>
         </div>
     </div>
 </div>

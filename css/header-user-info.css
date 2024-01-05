@@ -1,0 +1,26 @@
+
+.headerUserInfoBody {
+    line-height: 1;
+}
+
+.headerUserInfoName {
+    color: #fff;
+    font-size: 12px;
+}
+
+.headerUserInfoEmail {
+    color: #fff;
+    font-size: 12px;
+}
+
+.headerUserInfoIconBox {
+    border-radius: 50%;
+    border: 1px solid #fff;
+    width: 35px;
+    height: 35px;
+}
+
+.headerUserInfoIconBox span {
+    font-size: 20px;
+    color: #fff;
+}
