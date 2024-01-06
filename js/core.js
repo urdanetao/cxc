@@ -3758,12 +3758,12 @@ class Core {
         // Si se debe seleccionar una fila en especifico.
         if (gridStructure.hasOwnProperty('setSelectedRow') && gridStructure.setSelectedRow) {
             setSelectedRow = true;
-            if (gridStructure.hasOwnProperty('selectedField') &&
-                typeof(gridStructure.selectedField) == 'string') {
-                selectedField = gridStructure.selectedField;
+            if (gridStructure.hasOwnProperty('setSelectedField') &&
+                typeof(gridStructure.setSelectedField) == 'string') {
+                selectedField = gridStructure.setSelectedField;
             }
-            if (gridStructure.hasOwnProperty('selectedValue')) {
-                selectedValue = gridStructure.selectedValue;
+            if (gridStructure.hasOwnProperty('setSelectedValue')) {
+                selectedValue = gridStructure.setSelectedValue;
             }
         }
 

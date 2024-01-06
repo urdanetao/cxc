@@ -66,7 +66,6 @@ function loadResumenMoneda() {
 
     if (r.idemp == '0') {
         showResumenMoneda([]);
-        loadResumenCliente('');
         return;
     }
 
@@ -78,7 +77,6 @@ function loadResumenMoneda() {
             return;
         }
         showResumenMoneda(response.data);
-        loadResumenCliente('');
     });
 }
 
@@ -87,6 +85,17 @@ function loadResumenMoneda() {
  * Muestra el resumen por moneda.
  */
 function showResumenMoneda(data) {
+    var selected = false;
+
+    // Toma el elemento seleccionado (si lo hay).
+    var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
+    var moneda = core.grid.getSelectedRow($(".resumenMonedaBox", currentArea));
+
+    if (moneda.hasOwnProperty('idmon')) {
+        selected = true;
+    }
+
+    // Construye la nueva estructura.
     var gridStructure = {
         'tableTitle': 'Monedas registradas y saldos',
         'columns': [
@@ -102,8 +111,27 @@ function showResumenMoneda(data) {
         }
     };
 
+    if (selected) {
+        gridStructure.setSelectedRow = true;
+        gridStructure.setSelectedField = 'idmon';
+        gridStructure.setSelectedValue = moneda.idmon;
+    }
+
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     core.grid.build($(".resumenMonedaBox", currentArea), gridStructure);
+
+    if (selected) {
+        // Si el elemento seleccionado continua en la lista.
+        moneda = core.grid.getSelectedRow($(".resumenMonedaBox", currentArea));
+
+        if (moneda.hasOwnProperty('idmon')) {
+            loadResumenCliente(moneda.idmon);
+        } else {
+            showResumenCliente('');
+        }
+    } else {
+        showResumenCliente('');
+    }
 }
 
 
@@ -132,7 +160,7 @@ function showResumenCliente(data) {
             r.idcli = t.idcli;
             r.nomcli = t.nomcli;
             core.form.dialog.show('./cxc-detalle.php', r, () => {
-                loadResumenCliente(m.idmon);
+                loadResumenMoneda();
             });
         }
     };
@@ -313,5 +341,4 @@ $(() => {
     cxcLoadEmpresas();
     cxcLoadMonedas();
     showResumenMoneda([]);
-    showResumenCliente([]);
 });

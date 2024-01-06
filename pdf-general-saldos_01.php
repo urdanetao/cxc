@@ -2,7 +2,7 @@
 	/**
 	 * Funcion para imprimir la cabecera de la pagina.
 	 */
-	function pdfGeneralSaldosPrintPageHeader($pdf, $params, $page, $tpages) {
+	function pdfGeneralSaldosPrintPageHeader($pdf, $params, $page) {
 		// Nombre de la empresa.
 		$pdf->SetFont('Arial', '', 10);
 		$y = 10;
@@ -13,7 +13,7 @@
 
 		// Pagina.
 		$pdf->SetXY(10, $y);
-		$pdf->Cell(0, 0, "Pagina: $page de $tpages", 0, 1, 'R');
+		$pdf->Cell(0, 0, "Pagina: $page", 0, 1, 'R');
 
 		// Direccion
 		$y += 4;
@@ -140,14 +140,8 @@
 
 	define("__max_items", 32);
 
-	// Calcula el numero de paginas.
+	// Calcula el numero total de items.
 	$totalItems = count($data);
-	$tpages = $totalItems / __max_items;
-
-	if ($tpages > intval($tpages)) {
-		$tpages = intval($tpages) + 1;
-		$tpages = 1;
-	}
 
 	// Instancia el objeto para manejar el pdf.
 	$pdf = new FPDF('P', 'mm', 'Letter');
@@ -180,7 +174,7 @@
 			$page++;
 			
 			// Imprime la cabecera de la pagina.
-			$y = pdfGeneralSaldosPrintPageHeader($pdf, $params, $page, $tpages);
+			$y = pdfGeneralSaldosPrintPageHeader($pdf, $params, $page);
 
 			// Imprime la empresa.
 			$x = $leftMargin;
@@ -276,8 +270,31 @@
 				$totalCliente += floatval($data[$k]['saldo']); 
 				$totalMoneda += floatval($data[$k]['saldo']);
 	
+
 				$y += 4;
 				$k++;
+
+				if ($y > 230) {
+					// Agrega una nueva pagina.
+					$pdf->AddPage();
+					$pdf->SetFont('Arial', '', 8);
+					$page++;
+					
+					// Imprime la cabecera de la pagina.
+					$y = pdfGeneralSaldosPrintPageHeader($pdf, $params, $page, $tpages);
+
+					// Imprime la empresa.
+					$x = $leftMargin;
+					$cellWidth = 20;
+					$pdf->SetXY($x, $y);
+					$text = $data[$k]['nomemp'];
+					$pdf->Cell($cellWidth, 4, $text, 0, 0, 'L');
+
+					$y += 4;
+
+					// Imprime la cabecera de las columnas.
+					$y = pdfGeneralSaldosPrintColumnHeader($pdf, $y);
+				}
 			}
 
 			// Imprime el total del cliente.
