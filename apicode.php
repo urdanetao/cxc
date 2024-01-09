@@ -929,7 +929,6 @@
 		}
 
 		$sqlCommand .= ' order by t.nombre;';
-		saveLog($sqlCommand);
 		$r = $conn->Query($sqlCommand);
 
 		if ($r === false) {
@@ -1201,6 +1200,7 @@
 
 		$id = $jsonParams['id'];
 		$nombre = $jsonParams['nombre'];
+		$esp = normalizeBooleanInteger($jsonParams['esp']);
 
 		// Valida los campos requeridos.
 		if ($nombre == '') {
@@ -1266,14 +1266,15 @@
 			// Agrega el nuevo registro.
 			$sqlCommand =
 				"insert into clientes (
-					id, nombre)
+					id, nombre, esp)
 				values (
-					'$id', '$nombre');";
+					'$id', '$nombre', '$esp');";
 		} else {
 			// Actualiza el registro.
 			$sqlCommand =
 				"update clientes set
-					nombre = '$nombre'
+					nombre = '$nombre',
+					esp = '$esp'
 				where
 					id = '$id'";
 		}
@@ -2184,6 +2185,13 @@
 		$idemp = $params['idemp'];
 		$tipo = $params['tipo'];
 		$idcli = $params['idcli'];
+		$esp = normalizeBooleanInteger($params['esp']);
+
+		if ($esp == '1') {
+			$whereEsp = "true";
+		} else {
+			$whereEsp = "cl.esp = '0'";
+		}
 
 		if (isset($params['idmon'])) {
 			$idmon = $params['idmon'];
@@ -2252,6 +2260,7 @@
 					left join monedas as m on m.id = c.idmon
 					left join clientes as cl on cl.id = c.idcli
 				where
+					$whereEsp and
 					$whereEmpresa and
 					$condicionTipo and
 					$condicionCliente and

@@ -66,6 +66,23 @@
                         </div>
                     </div>
                 </fieldset>
+
+                <div class="vsep10"></div>
+
+                <fieldset>
+                    <legend>Opciones</legend>
+                    <div class="flex flex-vcenter flex-space-between">
+                        <div>
+                            <span class="lbl">Inluir clientes especiales</span>
+                        </div>
+                        <div>
+                            <label class="switch" for="espRepGenSaldos">
+                                <input type="checkbox" id="espRepGenSaldos" class="txb" name="esp">
+                                <div class="slider round"></div>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
                 
                 <br>
                 <div class="flex flex-right repGeneralSaldosButtonsBox">

@@ -39,6 +39,21 @@
                         </button>
                     </div>
                 </div>
+                <div class="vsep10"></div>
+                <fieldset>
+                    <legend>Opciones</legend>
+                    <div class="flex flex-vcenter flex-space-between">
+                        <div>
+                            <span class="lbl">Cliente Especial (Socio)</span>
+                        </div>
+                        <div>
+                            <label class="switch" for="espClientes">
+                                <input type="checkbox" id="espClientes" class="txb enable-editing" name="esp">
+                                <div class="slider round"></div>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
                 <br>
                 <div class="clientesButtonBox flex flex-right">
                     <button class="btn btn-info mini-btn btnClientesAdd enable-noshow enable-showing">
