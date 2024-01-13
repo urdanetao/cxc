@@ -1,0 +1,19 @@
+
+.repMovimientosPeriodoBody {
+    width: 100%;
+    height: calc(100vh - 50px - 32px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.repMovimientosPeriodoBody select[name="idemp"] {
+    width: 300px;
+}
+
+.repMovimientosPeriodoBody input[name="nomcli"] {
+    width: 242px;
+}
+
+.repMovimientosPeriodoBody .repMovimientosPeriodoButtonsBox > button {
+    width: 80px;
+}

@@ -124,7 +124,7 @@
 
 	// Toma los parametros.
 	$params = $_SESSION['reportData'];
-	$data = repGeneralSaldos01($params);
+	$data = repGeneralSaldos($params);
 
 	if (!$data['status']) {
 		$pdf->AddPage();

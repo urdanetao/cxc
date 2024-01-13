@@ -2,7 +2,7 @@
 /**
  * Carga las empresas registradas al combo.
  */
-function repGeneralSaldosEmpresasLoad() {
+ function repMovimientosPeriodoEmpresasLoad() {
     core.showLoading();
     core.apiFunction('empresasLoad', {}, (response) => {
         core.hideLoading();
@@ -21,7 +21,7 @@ function repGeneralSaldosEmpresasLoad() {
         
         html += '</select>';
         var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-        $('.repSaldoGeneralEmpresaBox', currentArea).html(html);
+        $('.repMovimientosPeriodoEmpresaBox', currentArea).html(html);
     });
 }
 
@@ -29,7 +29,7 @@ function repGeneralSaldosEmpresasLoad() {
 /**
  * Carga las monedas registradas al combo.
  */
-function repGeneralSaldosMonedasLoad() {
+ function repMovimientosPeriodoMonedasLoad() {
     core.showLoading();
     core.apiFunction('monedasLoad', {}, (response) => {
         core.hideLoading();
@@ -48,7 +48,7 @@ function repGeneralSaldosMonedasLoad() {
         
         html += '</select>';
         var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-        $('.repGeneralSaldosMonedaBox', currentArea).html(html);
+        $('.repMovimientosPeriodoMonedaBox', currentArea).html(html);
     });
 }
 
@@ -56,7 +56,7 @@ function repGeneralSaldosMonedasLoad() {
 /**
  * Busca un cliente.
  */
-function repGeneralSaldosBtnBuscarClienteClick() {
+ function repMovimientosPeriodoBtnBuscarClienteClick() {
     core.search({
         'title': 'Busqueda de Clientes',
         'column1': 'ID',
@@ -92,7 +92,7 @@ function repGeneralSaldosBtnBuscarClienteClick() {
 /**
  * Aquita el cliente seleccionado.
  */
-function repGeneralSaldosBtnQuitarClienteClick() {
+ function repMovimientosPeriodoBtnQuitarClienteClick() {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     var r = core.transform2Json(core.form.getData(currentArea));
     r.idcli = '';
@@ -104,7 +104,7 @@ function repGeneralSaldosBtnQuitarClienteClick() {
 /**
  * Genera el reporte.
  */
-function repGeneralSaldosBtnPrintClick() {
+ function repMovimientosPeriodoBtnPrintClick() {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     var r = core.transform2Json(core.form.getData(currentArea));
     r.nomemp = $('select[name="idemp"] option:selected', currentArea).html();
@@ -114,7 +114,7 @@ function repGeneralSaldosBtnPrintClick() {
     core.showLoading();
     core.apiFunction('prepare-report', r, function(response) {
         core.hideLoading();
-        window.open('./pdf-general-saldos.php');
+        window.open('./pdf-movimientos-periodo.php');
     });
 }
 
@@ -126,21 +126,21 @@ $(() => {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     core.linkNativeEvents(currentArea);
 
-    $('.repGeneralSaldosBtnBuscarCliente', currentArea).unbind('click');
-    $('.repGeneralSaldosBtnBuscarCliente', currentArea).on('click', () => {
-        repGeneralSaldosBtnBuscarClienteClick();
+    $('.repMovimientosPeriodoBtnBuscarCliente', currentArea).unbind('click');
+    $('.repMovimientosPeriodoBtnBuscarCliente', currentArea).on('click', () => {
+        repMovimientosPeriodoBtnBuscarClienteClick();
     });
 
-    $('.repGeneralSaldosBtnQuitarCliente', currentArea).unbind('click');
-    $('.repGeneralSaldosBtnQuitarCliente', currentArea).on('click', () => {
-        repGeneralSaldosBtnQuitarClienteClick();
+    $('.repMovimientosPeriodoBtnQuitarCliente', currentArea).unbind('click');
+    $('.repMovimientosPeriodoBtnQuitarCliente', currentArea).on('click', () => {
+        repMovimientosPeriodoBtnQuitarClienteClick();
     });
 
-    $('.repGeneralSaldosBtnPrint', currentArea).unbind('click');
-    $('.repGeneralSaldosBtnPrint', currentArea).on('click', () => {
-        repGeneralSaldosBtnPrintClick();
+    $('.repMovimientosPeriodoBtnPrint', currentArea).unbind('click');
+    $('.repMovimientosPeriodoBtnPrint', currentArea).on('click', () => {
+        repMovimientosPeriodoBtnPrintClick();
     });
 
-    repGeneralSaldosEmpresasLoad();
-    repGeneralSaldosMonedasLoad();
+    repMovimientosPeriodoEmpresasLoad();
+    repMovimientosPeriodoMonedasLoad();
 });

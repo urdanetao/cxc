@@ -2181,16 +2181,23 @@
 	/**
 	 * Reporte general de saldos 01.
 	 */
-	function repGeneralSaldos01($params) {
+	function repGeneralSaldos($params) {
 		$idemp = $params['idemp'];
 		$tipo = $params['tipo'];
 		$idcli = $params['idcli'];
 		$esp = normalizeBooleanInteger($params['esp']);
+		$pagados = normalizeBooleanInteger($params['pagados']);
 
 		if ($esp == '1') {
 			$whereEsp = "true";
 		} else {
 			$whereEsp = "cl.esp = '0'";
+		}
+
+		if ($pagados == '1') {
+			$wherePagados = "true";
+		} else {
+			$wherePagados = "c.pagado = '0'";
 		}
 
 		if (isset($params['idmon'])) {
@@ -2260,6 +2267,7 @@
 					left join monedas as m on m.id = c.idmon
 					left join clientes as cl on cl.id = c.idcli
 				where
+					$wherePagados and
 					$whereEsp and
 					$whereEmpresa and
 					$condicionTipo and

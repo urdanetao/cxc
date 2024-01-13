@@ -53,6 +53,12 @@ function showMenu() {
                         'command': () => {
                             core.tabs.build('.engineBodyWorkArea', 'Reporte General de Saldos', './rep-general-saldos.php', true);
                         }
+                    },
+                    {
+                        'text': 'Movimientos por Periodo',
+                        'command': () => {
+                            core.tabs.build('.engineBodyWorkArea', 'Reporte Movimientos por Periodo', './rep-movimientos-periodo.php', true);
+                        }
                     }
                 ]
             },

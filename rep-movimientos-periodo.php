@@ -1,18 +1,61 @@
 
+<?php
+    if (!isset($_SESSION['user'])) {
+        die();
+    }
+?>
+
 <!-- Hoja de estilos. -->
 <style>
-    <?php include __DIR__ . '/css/rep-general-saldos.css'; ?>
+    <?php include __DIR__ . '/css/rep-movimientos-periodo.css'; ?>
 </style>
 
 <!-- Cuerpo principal. -->
-<div class="repGeneralSaldosBody">
+<div class="repMovimientosPeriodoBody">
     <br>
     <div class="flex flex-hcenter">
         <div class="window">
             <div class="windowTitle">
-                <h6>Reporte General de Saldos</h6>
+                <h6>Reporte Movimientos por Periodo</h6>
             </div>
             <div class="windowBox">
+                <fieldset>
+                    <legend>Periodo</legend>
+                    <div class="flex">
+                        <div>
+                            <div>
+                                <span class="lbl">Desde</span>
+                            </div>
+                            <div>
+                                <input type="date" class="txb" name="desde">
+                            </div>
+                        </div>
+                        <div class="hsep10"></div>
+                        <div class="hsep10"></div>
+                        <div>
+                            <div>
+                                <span class="lbl">Hasta</span>
+                            </div>
+                            <div>
+                                <input type="date" class="txb" name="hasta">
+                            </div>
+                        </div>
+                        <div class="hsep10"></div>
+                        <div class="hsep10"></div>
+                        <div>
+                            <div>
+                                <span class="lbl">Tipo Reporte</span>
+                            </div>
+                            <div>
+                                <select class="txb" name="tipoReporte">
+                                    <option value="1">Resumido</option>
+                                    <option value="2">Detallado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="vsep10"></div>
                 <fieldset>
                     <legend>Filtros del Reporte</legend>
                     <div class="flex">
@@ -20,7 +63,7 @@
                             <div>
                                 <span class="lbl">Empresa</span>
                             </div>
-                            <div class="repSaldoGeneralEmpresaBox"></div>
+                            <div class="repMovimientosPeriodoEmpresaBox"></div>
                         </div>
                         <div class="hsep10"></div>
                         <div class="hsep10"></div>
@@ -47,11 +90,11 @@
                                 <input type="text" class="txb" name="idcli" hidden>
                                 <input type="text" class="txb txb-str" name="nomcli" placeholder="Mostrar Todos los Clientes" disabled>
                                 <div class="hsep5"></div>
-                                <button class="btn btn-info mini-btn repGeneralSaldosBtnBuscarCliente">
+                                <button class="btn btn-info mini-btn repMovimientosPeriodoBtnBuscarCliente">
                                     <span class="icon icon-search"></span>
                                 </button>
                                 <div class="hsep5"></div>
-                                <button class="btn btn-danger mini-btn repGeneralSaldosBtnQuitarCliente">
+                                <button class="btn btn-danger mini-btn repMovimientosPeriodoBtnQuitarCliente">
                                     <span class="icon icon-cross"></span>
                                 </button>
                             </div>
@@ -62,7 +105,7 @@
                             <div>
                                 <span class="lbl">Moneda</span>
                             </div>
-                            <div class="repGeneralSaldosMonedaBox"></div>
+                            <div class="repMovimientosPeriodoMonedaBox"></div>
                         </div>
                     </div>
                 </fieldset>
@@ -82,30 +125,18 @@
                             </label>
                         </div>
                     </div>
-                    <div class="vsep10"></div>
-                    <div class="flex flex-vcenter flex-space-between">
-                        <div>
-                            <span class="lbl">Inluir cuentas con saldo cero (0)</span>
-                        </div>
-                        <div>
-                            <label class="switch" for="pagadosRepGenSaldos">
-                                <input type="checkbox" id="pagadosRepGenSaldos" class="txb" name="pagados">
-                                <div class="slider round"></div>
-                            </label>
-                        </div>
-                    </div>
                 </fieldset>
                 
                 <br>
-                <div class="flex flex-right repGeneralSaldosButtonsBox">
-                    <button class="btn btn-info repGeneralSaldosBtnPrint">Imprimir</button>
+                <div class="flex flex-right repMovimientosPeriodoButtonsBox">
+                    <button class="btn btn-info repMovimientosPeriodoBtnPrint">Imprimir</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Codigo javascript. -->
+<!-- Javascript. -->
 <script>
-    <?php include __DIR__ . '/js/rep-general-saldos.js'; ?>
+    <?php include __DIR__ . '/js/rep-movimientos-periodo.js'; ?>
 </script>
