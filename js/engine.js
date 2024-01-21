@@ -59,6 +59,12 @@ function showMenu() {
                         'command': () => {
                             core.tabs.build('.engineBodyWorkArea', 'Reporte Movimientos por Periodo', './rep-movimientos-periodo.php', true);
                         }
+                    },
+                    {
+                        'text': 'Pagos por Periodo',
+                        'command': () => {
+                            core.tabs.build('.engineBodyWorkArea', 'Reporte Pagos por Periodo', './rep-pagos-periodo.php', true);
+                        }
                     }
                 ]
             },

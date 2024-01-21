@@ -1,0 +1,19 @@
+
+.repPagosPeriodoBody {
+    width: 100%;
+    height: calc(100vh - 50px - 32px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.repPagosPeriodoBody select[name="idemp"] {
+    width: 300px;
+}
+
+.repPagosPeriodoBody input[name="nomcli"] {
+    width: 242px;
+}
+
+.repPagosPeriodoBody .repPagosPeriodoButtonsBox > button {
+    width: 80px;
+}

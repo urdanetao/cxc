@@ -2,7 +2,7 @@
 /**
  * Carga las empresas registradas al combo.
  */
- function repMovimientosPeriodoEmpresasLoad() {
+function repPagosPeriodoEmpresasLoad() {
     core.showLoading();
     core.apiFunction('empresasLoad', {}, (response) => {
         core.hideLoading();
@@ -21,7 +21,7 @@
         
         html += '</select>';
         var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-        $('.repMovimientosPeriodoEmpresaBox', currentArea).html(html);
+        $('.repPagosPeriodoEmpresaBox', currentArea).html(html);
     });
 }
 
@@ -29,7 +29,7 @@
 /**
  * Carga las monedas registradas al combo.
  */
- function repMovimientosPeriodoMonedasLoad() {
+ function repPagosPeriodoMonedasLoad() {
     core.showLoading();
     core.apiFunction('monedasLoad', {}, (response) => {
         core.hideLoading();
@@ -48,7 +48,7 @@
         
         html += '</select>';
         var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
-        $('.repMovimientosPeriodoMonedaBox', currentArea).html(html);
+        $('.repPagosPeriodoMonedaBox', currentArea).html(html);
     });
 }
 
@@ -56,7 +56,7 @@
 /**
  * Busca un cliente.
  */
- function repMovimientosPeriodoBtnBuscarClienteClick() {
+function repPagosPeriodoBtnBuscarClienteClick() {
     core.search({
         'title': 'Busqueda de Clientes',
         'column1': 'ID',
@@ -92,7 +92,7 @@
 /**
  * Aquita el cliente seleccionado.
  */
- function repMovimientosPeriodoBtnQuitarClienteClick() {
+ function repPagosPeriodoBtnQuitarClienteClick() {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     var r = core.transform2Json(core.form.getData(currentArea));
     r.idcli = '';
@@ -104,7 +104,7 @@
 /**
  * Genera el reporte.
  */
- function repMovimientosPeriodoBtnPrintClick() {
+ function repPagosPeriodoBtnPrintClick() {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     var r = core.transform2Json(core.form.getData(currentArea));
     r.nomemp = $('select[name="idemp"] option:selected', currentArea).html();
@@ -114,10 +114,10 @@
     var reportTemplate;
     switch (r.tipoReporte) {
         case '1':
-            reportTemplate = 'pdf-movimientos-periodo-01.php';
+            reportTemplate = 'pdf-pagos-periodo-01.php';
             break;
         case '2':
-            reportTemplate = 'pdf-movimientos-periodo-02.php';
+            reportTemplate = 'pdf-pagos-periodo-02.php';
             break;
         default:
             core.showMessage('Tipo de reporte inválido', 4, core.color.error);
@@ -139,21 +139,21 @@ $(() => {
     var currentArea = core.tabs.getActiveTabArea('.engineBodyWorkArea');
     core.linkNativeEvents(currentArea);
 
-    $('.repMovimientosPeriodoBtnBuscarCliente', currentArea).unbind('click');
-    $('.repMovimientosPeriodoBtnBuscarCliente', currentArea).on('click', () => {
-        repMovimientosPeriodoBtnBuscarClienteClick();
+    $('.repPagosPeriodoBtnBuscarCliente', currentArea).unbind('click');
+    $('.repPagosPeriodoBtnBuscarCliente', currentArea).on('click', () => {
+        repPagosPeriodoBtnBuscarClienteClick();
     });
 
-    $('.repMovimientosPeriodoBtnQuitarCliente', currentArea).unbind('click');
-    $('.repMovimientosPeriodoBtnQuitarCliente', currentArea).on('click', () => {
-        repMovimientosPeriodoBtnQuitarClienteClick();
+    $('.repPagosPeriodoBtnQuitarCliente', currentArea).unbind('click');
+    $('.repPagosPeriodoBtnQuitarCliente', currentArea).on('click', () => {
+        repPagosPeriodoBtnQuitarClienteClick();
     });
 
-    $('.repMovimientosPeriodoBtnPrint', currentArea).unbind('click');
-    $('.repMovimientosPeriodoBtnPrint', currentArea).on('click', () => {
-        repMovimientosPeriodoBtnPrintClick();
+    $('.repPagosPeriodoBtnPrint', currentArea).unbind('click');
+    $('.repPagosPeriodoBtnPrint', currentArea).on('click', () => {
+        repPagosPeriodoBtnPrintClick();
     });
 
-    repMovimientosPeriodoEmpresasLoad();
-    repMovimientosPeriodoMonedasLoad();
+    repPagosPeriodoEmpresasLoad();
+    repPagosPeriodoMonedasLoad();
 });

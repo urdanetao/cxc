@@ -85,7 +85,7 @@
                     <div class="vsep10"></div>
                     <div class="flex flex-vcenter flex-space-between">
                         <div>
-                            <span class="lbl">Inluir cuentas con saldo cero (0)</span>
+                            <span class="lbl">Inluir movimientos pagados</span>
                         </div>
                         <div>
                             <label class="switch" for="pagadosRepGenSaldos">

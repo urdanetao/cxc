@@ -2,7 +2,7 @@
 	/**
 	 * Funcion para imprimir la cabecera de la pagina.
 	 */
-	function pdfGeneralSaldosPrintPageHeader($pdf, $params, $page) {
+	function pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page) {
 		// Nombre de la empresa.
 		$pdf->SetFont('Arial', '', 10);
 		$y = 10;
@@ -34,8 +34,26 @@
 		$pdf->SetFont('Arial', 'B', 12);
 		$y += 8;
 		$pdf->SetXY(10, $y);
-		$text = 'Reporte General de Saldos CxC';
+		$text = 'Reporte Movimientos por Periodo (RESUMIDO)';
 		$pdf->Cell(0, 0, utf8_decode($text), 0, 1, 'C');
+
+        // Periodo
+        $y += 4;
+		$pdf->SetFont('Arial', '', 8);
+		$pdf->SetXY(10, $y);
+        $text = 'DESDE: ';
+        if ($params['desde'] == '') {
+            $text .= 'TODOS';
+        } else {
+            $text .= reverseDate($params['desde']);
+        }
+        $text .= ' - HASTA: ';
+        if ($params['hasta'] == '') {
+            $text .= 'TODOS';
+        } else {
+            $text .= reverseDate($params['hasta']);
+        }
+        $pdf->Cell(0, 0, 'PERIODO => ' . $text, 0, 0, 'C');
 
         // Empresa.
         $y += 4;
@@ -60,6 +78,12 @@
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetXY(10, $y);
         $text = ($params['idcli'] == '') ? 'TODOS LOS CLIENTES' : $params['nomcli'];
+        $text .= ' - INCL. ESPECIALES: ';
+        if (normalizeBooleanInteger($params['esp']) == '0') {
+            $text .= 'NO';
+        } else {
+            $text .= 'SI';
+        }
         $pdf->Cell(0, 0, 'CLIENTE: ' . $text, 0, 0, 'C');
 
 		return $y + 5;
@@ -68,7 +92,7 @@
 	/**
 	 * Funcion para imprimir la cabecera de las columnas.
 	 */
-	function pdfGeneralSaldosPrintColumnHeader($pdf, $y) {
+	function pdfMovimientosPeriodoPrintColumnHeader($pdf, $y) {
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetFillColor(200, 200, 200);
 
@@ -88,12 +112,12 @@
 		$pdf->Cell($cellWidth, 4, 'MONEDA', 0, 0, 'L', true);
 
 		$x += $cellWidth;
-		$cellWidth = 34;
+		$cellWidth = 54;
 		$pdf->SetXY($x, $y);
 		$pdf->Cell($cellWidth, 4, 'CLIENTE', 0, 0, 'L', true);
 
 		$x += $cellWidth;
-		$cellWidth = 50;
+		$cellWidth = 74;
 		$pdf->SetXY($x, $y);
 		$pdf->Cell($cellWidth, 4, 'DESCRIPCION', 0, 0, 'L', true);
 
@@ -101,16 +125,6 @@
 		$cellWidth = 22;
 		$pdf->SetXY($x, $y);
 		$pdf->Cell($cellWidth, 4, 'MONTO', 0, 0, 'C', true);
-
-		$x += $cellWidth;
-		$cellWidth = 22;
-		$pdf->SetXY($x, $y);
-		$pdf->Cell($cellWidth, 4, 'ABONOS', 0, 0, 'C', true);
-
-		$x += $cellWidth;
-		$cellWidth = 22;
-		$pdf->SetXY($x, $y);
-		$pdf->Cell($cellWidth, 4, 'SALDO', 0, 0, 'C', true);
 
 		return $y + 5;
 	}
@@ -124,7 +138,7 @@
 
 	// Toma los parametros.
 	$params = $_SESSION['reportData'];
-	$data = repGeneralSaldos($params);
+	$data = repMovimientosPeriodoResumido($params);
 
 	if (!$data['status']) {
 		$pdf->AddPage();
@@ -174,7 +188,7 @@
 			$page++;
 			
 			// Imprime la cabecera de la pagina.
-			$y = pdfGeneralSaldosPrintPageHeader($pdf, $params, $page);
+			$y = pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page);
 
 			// Imprime la empresa.
 			$x = $leftMargin;
@@ -187,7 +201,7 @@
 		}
 
 		// Imprime la cabecera de las columnas.
-		$y = pdfGeneralSaldosPrintColumnHeader($pdf, $y);
+		$y = pdfMovimientosPeriodoPrintColumnHeader($pdf, $y);
 
 		// Mientras queden registros y sea la misma moneda.
 		$idmon = $data[$k]['idmon'];
@@ -234,42 +248,27 @@
 	
 				// Cliente.
 				$x += $cellWidth;
-				$cellWidth = 34;
-				$text = truncateString($data[$k]['nomcli'], 20);
+				$cellWidth = 54;
+				$text = truncateString($data[$k]['nomcli'], 25);
 				$pdf->SetXY($x, $y);
 				$pdf->Cell($cellWidth, 4, $text, 0, 0, 'L');
 	
 				// Descripcion.
 				$x += $cellWidth;
-				$cellWidth = 50;
-				$text = truncateString($data[$k]['descrip'], 30);
+				$cellWidth = 74;
+				$text = truncateString($data[$k]['descrip'], 35);
 				$pdf->SetXY($x, $y);
 				$pdf->Cell($cellWidth, 4, $text, 0, 0, 'L');
 	
 				// Monto.
 				$x += $cellWidth;
 				$cellWidth = 22;
-				$text = number_format($data[$k]['debitos'], 2, '.', ',');
+				$text = number_format($data[$k]['monto'], 2, '.', ',');
 				$pdf->SetXY($x, $y);
 				$pdf->Cell($cellWidth, 4, $text, 0, 0, 'R');
 	
-				// Abonos.
-				$x += $cellWidth;
-				$cellWidth = 22;
-				$text = number_format($data[$k]['creditos'], 2, '.', ',');
-				$pdf->SetXY($x, $y);
-				$pdf->Cell($cellWidth, 4, $text, 0, 0, 'R');
-	
-				// Saldo.
-				$x += $cellWidth;
-				$cellWidth = 22;
-				$text = number_format($data[$k]['saldo'], 2, '.', ',');
-				$pdf->SetXY($x, $y);
-				$pdf->Cell($cellWidth, 4, $text, 0, 0, 'R');
-				
-				$totalCliente += floatval($data[$k]['saldo']); 
-				$totalMoneda += floatval($data[$k]['saldo']);
-	
+				$totalCliente += floatval($data[$k]['monto']); 
+				$totalMoneda += floatval($data[$k]['monto']);
 
 				$y += 4;
 				$k++;
@@ -281,7 +280,7 @@
 					$page++;
 					
 					// Imprime la cabecera de la pagina.
-					$y = pdfGeneralSaldosPrintPageHeader($pdf, $params, $page);
+					$y = pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page);
 
 					// Imprime la empresa.
 					$x = $leftMargin;
@@ -293,7 +292,7 @@
 					$y += 4;
 
 					// Imprime la cabecera de las columnas.
-					$y = pdfGeneralSaldosPrintColumnHeader($pdf, $y);
+					$y = pdfMovimientosPeriodoPrintColumnHeader($pdf, $y);
 				}
 			}
 
