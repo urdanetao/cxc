@@ -2,7 +2,7 @@
 	/**
 	 * Funcion para imprimir la cabecera de la pagina.
 	 */
-	function pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page) {
+	function pdfPagosPeriodoPrintPageHeader($pdf, $params, $page) {
 		// Nombre de la empresa.
 		$pdf->SetFont('Arial', '', 10);
 		$y = 10;
@@ -34,7 +34,7 @@
 		$pdf->SetFont('Arial', 'B', 12);
 		$y += 8;
 		$pdf->SetXY(10, $y);
-		$text = 'Reporte Movimientos por Periodo (DETALLADO)';
+		$text = 'Reporte Pagos por Periodo (DETALLADO)';
 		$pdf->Cell(0, 0, utf8_decode($text), 0, 1, 'C');
 
         // Periodo
@@ -92,7 +92,7 @@
 	/**
 	 * Funcion para imprimir la cabecera de las columnas.
 	 */
-	function pdfMovimientosPeriodoPrintColumnHeader($pdf, $y) {
+	function pdfPagosPeriodoPrintColumnHeader($pdf, $y) {
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetFillColor(200, 200, 200);
 
@@ -138,7 +138,7 @@
 
 	// Toma los parametros.
 	$params = $_SESSION['reportData'];
-	$data = repMovimientosPeriodoDetallado($params);
+	$data = repPagosPeriodoDetallado($params);
 
 	if (!$data['status']) {
 		$pdf->AddPage();
@@ -188,7 +188,7 @@
 			$page++;
 			
 			// Imprime la cabecera de la pagina.
-			$y = pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page);
+			$y = pdfPagosPeriodoPrintPageHeader($pdf, $params, $page);
 
 			// Imprime la empresa.
 			$x = $leftMargin;
@@ -201,7 +201,7 @@
 		}
 
 		// Imprime la cabecera de las columnas.
-		$y = pdfMovimientosPeriodoPrintColumnHeader($pdf, $y);
+		$y = pdfPagosPeriodoPrintColumnHeader($pdf, $y);
 
 		// Mientras queden registros y sea la misma moneda.
 		$idmon = $data[$k]['idmon'];
@@ -280,7 +280,7 @@
 					$page++;
 					
 					// Imprime la cabecera de la pagina.
-					$y = pdfMovimientosPeriodoPrintPageHeader($pdf, $params, $page);
+					$y = pdfPagosPeriodoPrintPageHeader($pdf, $params, $page);
 
 					// Imprime la empresa.
 					$x = $leftMargin;
@@ -292,7 +292,7 @@
 					$y += 4;
 
 					// Imprime la cabecera de las columnas.
-					$y = pdfMovimientosPeriodoPrintColumnHeader($pdf, $y);
+					$y = pdfPagosPeriodoPrintColumnHeader($pdf, $y);
 				}
 			}
 

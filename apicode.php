@@ -2313,13 +2313,13 @@
 		if ($desde == '') {
 			$whereDesde = 'true';
 		} else {
-			$whereDesde = "t.fecha <= '$desde'";
+			$whereDesde = "t.fecha >= '$desde'";
 		}
 
 		if ($hasta == '') {
 			$whereHasta = 'true';
 		} else {
-			$whereHasta = "t.fecha >= '$hasta'";
+			$whereHasta = "t.fecha <= '$hasta'";
 		}
 
 		// Empresa.
@@ -2433,13 +2433,13 @@
 		if ($desde == '') {
 			$whereDesde = 'true';
 		} else {
-			$whereDesde = "t.fecha <= '$desde'";
+			$whereDesde = "t.fecha >= '$desde'";
 		}
 
 		if ($hasta == '') {
 			$whereHasta = 'true';
 		} else {
-			$whereHasta = "t.fecha >= '$hasta'";
+			$whereHasta = "t.fecha <= '$hasta'";
 		}
 
 		// Empresa.
@@ -2532,7 +2532,262 @@
 				m.siglas,
 				c.nombre";
 
+		$result = $conn->Query($sqlCommand);
+
+		if ($result === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, '', $result);
+	}
+
+
+	/**
+	 * Reporte de pagos por periodo resumido.
+	 */
+	function repPagosPeriodoResumido($params) {
+		$desde = $params['desde'];
+		$hasta = $params['hasta'];
+		$idemp = $params['idemp'];
+		$tipo = $params['tipo'];
+		$idcli = $params['idcli'];
+		$idmon = $params['idmon'];
+		$esp = normalizeBooleanInteger($params['esp']);
+		$pagados = normalizeBooleanInteger($params['pagados']);
+
+		// Periodo.
+		if ($desde == '') {
+			$whereDesde = 'true';
+		} else {
+			$whereDesde = "pag.fecha >= '$desde'";
+		}
+
+		if ($hasta == '') {
+			$whereHasta = 'true';
+		} else {
+			$whereHasta = "pag.fecha <= '$hasta'";
+		}
+
+		// Empresa.
+		if ($idemp == '0') {
+			$whereEmpresa = 'true';
+		} else {
+			$whereEmpresa = "t.idemp = '$idemp'";
+		}
+
+		// Tipo transaccion: personales o comerciales.
+		switch ($tipo) {
+			case '0':
+				$whereTipo = 'true';
+				break;
+			case '1':
+				$whereTipo = "t.tipo = '1'";
+				break;
+			case '2':
+				$whereTipo = "t.tipo = '2'";
+				break;
+		}
+
+		// Cliente.
+		if ($idcli == '') {
+			$whereCliente = 'true';
+		} else {
+			$whereCliente = "t.idcli = '$idcli'";
+		}
+
+		// Condicion de la moneda.
+		if ($idmon == '0') {
+			$whereMoneda = 'true';
+		} else {
+			$whereMoneda = "t.idmon = $idmon";
+		}
+
+		if ($esp == '1') {
+			$whereEsp = "true";
+		} else {
+			$whereEsp = "c.esp = '0'";
+		}
+
+		if ($pagados == '1') {
+			$wherePagados = "true";
+		} else {
+			$wherePagados = "t.pagado = '0'";
+		}
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				t.idemp,
+				e.nombre as nomemp,
+				t.idmon,
+				m.siglas as siglas,
+				m.nombre as nommon,
+				pag.fecha,
+				t.tipo,
+				c.nombre as nomcli,
+				sum(pag.monto) as monto,
+				'===>' as descrip
+			from
+				cxcpag as pag
+				left join cxc as t on t.id = pag.idparent
+				left join empresas as e on e.id = t.idemp
+				left join monedas as m on m.id = t.idmon
+				left join clientes as c on c.id = t.idcli
+			where
+				$whereDesde and $whereHasta and
+				$whereEmpresa and
+				$whereTipo and
+				$whereCliente and
+				$whereMoneda and
+				$whereEsp and
+				$wherePagados
+			group by
+				t.idcli
+			order by
+				e.nombre,
+				m.siglas,
+				pag.fecha,
+				c.nombre";
+
 		saveLog($sqlCommand);
+		$result = $conn->Query($sqlCommand);
+
+		if ($result === false) {
+			$conn->Close();
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$conn->Close();
+
+		return getResultObject(true, '', $result);
+	}
+
+
+	/**
+	 * Reporte de pagos por periodo detallado.
+	 */
+	function repPagosPeriodoDetallado($params) {
+		$desde = $params['desde'];
+		$hasta = $params['hasta'];
+		$idemp = $params['idemp'];
+		$tipo = $params['tipo'];
+		$idcli = $params['idcli'];
+		$idmon = $params['idmon'];
+		$esp = normalizeBooleanInteger($params['esp']);
+		$pagados = normalizeBooleanInteger($params['pagados']);
+
+		// Periodo.
+		if ($desde == '') {
+			$whereDesde = 'true';
+		} else {
+			$whereDesde = "t.fecha >= '$desde'";
+		}
+
+		if ($hasta == '') {
+			$whereHasta = 'true';
+		} else {
+			$whereHasta = "t.fecha <= '$hasta'";
+		}
+
+		// Empresa.
+		if ($idemp == '0') {
+			$whereEmpresa = 'true';
+		} else {
+			$whereEmpresa = "t.idemp = '$idemp'";
+		}
+
+		// Tipo transaccion: personales o comerciales.
+		switch ($tipo) {
+			case '0':
+				$whereTipo = 'true';
+				break;
+			case '1':
+				$whereTipo = "t.tipo = '1'";
+				break;
+			case '2':
+				$whereTipo = "t.tipo = '2'";
+				break;
+		}
+
+		// Cliente.
+		if ($idcli == '') {
+			$whereCliente = 'true';
+		} else {
+			$whereCliente = "t.idcli = '$idcli'";
+		}
+
+		// Condicion de la moneda.
+		if ($idmon == '0') {
+			$whereMoneda = 'true';
+		} else {
+			$whereMoneda = "t.idmon = $idmon";
+		}
+
+		if ($esp == '1') {
+			$whereEsp = "true";
+		} else {
+			$whereEsp = "c.esp = '0'";
+		}
+
+		if ($pagados == '1') {
+			$wherePagados = "true";
+		} else {
+			$wherePagados = "t.pagado = '0'";
+		}
+
+		// Conecta con la base de datos.
+		$dbInfo = getMySqlDbInfo('cxc');
+		$conn = new MySqlDataManager($dbInfo);
+
+		if (!$conn->IsConnected()) {
+			return getResultObject(false, $conn->GetErrorMessage());
+		}
+
+		$sqlCommand =
+			"select
+				t.id,
+				t.idemp,
+				t.idmon,
+				t.idcli,
+				t.tipo,
+				t.fecha,
+				t.pagado,
+				e.nombre as nomemp,
+				m.siglas as siglas,
+				m.nombre as nommon,
+				c.nombre as nomcli,
+				pag.descrip,
+				pag.monto
+			from
+				cxcpag as pag
+				left join cxc as t on t.id = pag.idparent
+				left join empresas as e on e.id = t.idemp
+				left join monedas as m on m.id = t.idmon
+				left join clientes as c on c.id = t.idcli
+			where
+				$whereDesde and $whereHasta and
+				$whereEmpresa and
+				$whereTipo and
+				$whereCliente and
+				$whereMoneda and
+				$whereEsp and
+				$wherePagados
+			order by
+				e.nombre,
+				m.siglas,
+				t.fecha,
+				c.nombre";
+
 		$result = $conn->Query($sqlCommand);
 
 		if ($result === false) {
